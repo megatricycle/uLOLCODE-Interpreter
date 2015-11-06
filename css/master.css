@@ -1,0 +1,71 @@
+html, body {
+  background-color: #101112;
+  padding: 10px;
+  color: white;
+}
+
+h5 {
+  margin: 0;
+}
+
+textarea {
+  resize: none;
+  border: none;
+}
+
+table {
+  font-size: 13px;
+}
+
+th, td {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.card-panel, textarea {
+  background-color: #151718;
+}
+
+.center-text {
+  text-align: center;
+}
+
+.upper-panel {
+  height: 225px;
+  overflow-y: scroll;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.row {
+  margin-bottom: 10px;
+}
+
+.console {
+  height: 125px;
+  padding: 10px;
+  overflow-y: auto;
+  font-family: Courier;
+}
+
+.no-padding {
+  padding: 0;
+}
+
+.no-margin {
+  margin: 0;
+}
+
+.green-text {
+  color: #8dca56;
+}
+
+.blue-text {
+  color: #55b5db;
+}
+
+.pink {
+  color: #55b5db;
+}

@@ -1,0 +1,86 @@
+<html>
+  <head>
+    <title>uLOLCODE Interpreter</title>
+
+    <link rel="stylesheet" href="css/materialize.min.css" media="screen" title="no title" charset="utf-8">
+    <link rel="stylesheet" href="css/master.css" media="screen" title="no title" charset="utf-8">
+  </head>
+  <body>
+    <div class="row">
+      <div class="col s4 upper-part">
+        <h5 class="center-text">Code</h5>
+        <div class="card-panel upper-panel no-padding">
+          <textarea style="height: 100%;"></textarea>
+        </div>
+      </div>
+      <div class="col s4 upper-part">
+        <h5 class="center-text">Lexemes</h5>
+        <div class="card-panel upper-panel no-padding">
+          <table>
+            <thead>
+              <tr>
+                  <th>Lexeme</th>
+                  <th>Description</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td class="green-text">HAI</td>
+                <td>Start</td>
+              </tr>
+              <tr>
+                <td class="green-text">I HAS A</td>
+                <td>Variable Declaration</td>
+              </tr>
+              <tr>
+                <td class="green-text">X</td>
+                <td>Variable identifier</td>
+              </tr>
+              <tr>
+                <td class="green-text">KTHXBYE</td>
+                <td>End</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col s4 upper-part">
+        <h5 class="center-text">Symbol table</h5>
+        <div class="card-panel upper-panel no-padding">
+          <table class="centered">
+            <thead>
+              <tr>
+                  <th>Identifier</th>
+                  <th>Value</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td class="pink-text">X</td>
+                <td>YEYE</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <a href="#" class="btn btn-full waves-effect waves-light grey">EXECUTE</a>
+    </div>
+    <div>
+      <h5>Console</h5>
+      <div class="card-panel console">
+        <p class="no-margin">Parser > Success</p>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      // load jquery
+      window.$ = window.jQuery = require('./js/jquery-2.1.4.min.js');
+    </script>
+    <script src="js/materialize.min.js" type="text/javascript"></script>
+    <script src="js/app.js" type="text/javascript"></script>
+  </body>
+</html>
