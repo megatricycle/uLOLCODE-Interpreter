@@ -2,10 +2,12 @@ html, body {
   background-color: #101112;
   padding: 10px;
   color: white;
+  overflow-y: hidden;
 }
 
 h5 {
   margin: 0;
+  font-size: 125%;
 }
 
 textarea {
@@ -22,8 +24,13 @@ th, td {
   padding-bottom: 5px;
 }
 
-.card-panel, textarea {
-  background-color: #151718;
+#editor {
+  position: relative;
+  height: 100%;
+}
+
+.card-panel {
+  background-color: black;
 }
 
 .center-text {
@@ -31,8 +38,8 @@ th, td {
 }
 
 .upper-panel {
-  height: 225px;
-  overflow-y: scroll;
+  height: 240px;
+  overflow-y: auto;
 }
 
 .btn-full {
@@ -43,11 +50,29 @@ th, td {
   margin-bottom: 10px;
 }
 
-.console {
-  height: 125px;
-  padding: 10px;
-  overflow-y: auto;
+.console-panel {
+  height: 140px;
   font-family: Courier;
+  padding: 10px;
+}
+
+#input {
+  height: 25px;
+  width: 900px;
+  border: none !important;
+  border-bottom: none !important;
+  box-shadow: none;
+}
+
+#input:focus {
+  border: none !important;
+  border-bottom: none !important;
+  box-shadow: none;
+}
+
+.console {
+  height: 105px;
+  overflow-y: auto;
 }
 
 .no-padding {
@@ -62,10 +87,18 @@ th, td {
   color: #8dca56;
 }
 
-.blue-text {
+.white-text {
+  color: white;
+}
+
+.red-text {
   color: #55b5db;
 }
 
-.pink {
-  color: #55b5db;
+.ng-cloak {
+  display: none !important;
+}
+
+.show {
+  display: inherit !important;
 }

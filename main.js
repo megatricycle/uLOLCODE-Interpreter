@@ -1,6 +1,8 @@
 var app = require('app');  // Module to control application life.
 var BrowserWindow = require('browser-window');  // Module to create native browser window.
 var ipc = require('ipc');
+var fs = require('fs');
+var dialog = require('dialog');
 
 // Report crashes to our server.
 require('crash-reporter').start();
@@ -44,13 +46,20 @@ app.on('ready', function() {
   // listen
   ipc.on('open-file', function(){
     // open dialog box
-    var dialog = require('dialog');
     dialog.showOpenDialog({
       properties: ['openFile'],
       filters: [{
         name: 'LOLCODES',
         extensions: ['lol']
       }]
+    }, function(filename){
+      fs.readFile(filename[0], 'utf8', function(err, data){
+        mainWindow.webContents.send('send-code', data);
+      });
     });
+  });
+
+  ipc.on('open-devtools', function(){
+    mainWindow.openDevTools();
   });
 });
