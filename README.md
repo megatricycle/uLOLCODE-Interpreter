@@ -1,5 +1,5 @@
 # uLOLCODE Interpreter 
-	Made with ❤ by Hasht3.
+Made with ❤ by Hasht3x.
 
 ## Setup
 
