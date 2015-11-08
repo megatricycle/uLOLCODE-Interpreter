@@ -62,56 +62,22 @@ angular.module('app', []).controller('AppController', function($scope){
 
       // test
       if(/^\s*HAI\s*$/.test(lines[i])){
-        $scope.lexemes.push({
-          lexeme: {
-            text: 'HAI',
-            color: 'green-text'
-          },
-          desc: 'Keyword'
-        });
+        addLexeme('HAI', 'green-text', 'Code delimeter');
       }
       else if(/^\s*KTHXBYE\s*$/.test(lines[i])){
-        $scope.lexemes.push({
-          lexeme: {
-            text: 'KTHXBYE',
-            color: 'green-text'
-          },
-          desc: 'Keyword'
-        });
+        addLexeme('KTHXBYE', 'green-text', 'Code delimeter');
       }
       else if(/\s*I HAS A\s+/.test(lines[i])){
-        $scope.lexemes.push({
-          lexeme: {
-            text: 'I HAS A',
-            color: 'green-text'
-          },
-          desc: 'Keyword'
-        });
+        addLexeme('I HAS A', 'green-text', 'Variable declaration');
 
         var identifier = lines[i].substr(8).trim();
 
         // add variable
-        $scope.lexemes.push({
-          lexeme: {
-            text: identifier,
-            color: 'white-text'
-          },
-          desc: 'Identifier'
-        });
+        addLexeme(identifier, 'white-text', 'Variable identifier');
 
         // check if symbol already exists
         if($scope.symbolTable.indexOfAttr('identifier', identifier) == -1){
-          $scope.symbolTable.push({
-            identifier: identifier,
-            type: {
-              text: 'undefined',
-              color: 'red-text'
-            },
-            value: {
-              text: 'undefined',
-              color: 'red-text'
-            }
-          });
+          addSymbol(identifier, 'undefined', 'red-text', 'undefined', 'red-text');
         }
       }
     }
@@ -126,4 +92,29 @@ angular.module('app', []).controller('AppController', function($scope){
   }, function(){
     $('.console').scrollTop($('.console')[0].scrollHeight);
   });
+
+  // helper functions
+  function addLexeme(text, color, desc){
+    $scope.lexemes.push({
+      lexeme: {
+        text: text,
+        color: color
+      },
+      desc: desc
+    });
+  }
+
+  function addSymbol(identifier, typeText, typeColor, valueText, valueColor){
+    $scope.symbolTable.push({
+      identifier: identifier,
+      type: {
+        text: typeText,
+        color: typeColor
+      },
+      value: {
+        text: valueText,
+        color: valueColor
+      }
+    });
+  }
 });
