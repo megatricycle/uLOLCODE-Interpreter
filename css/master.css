@@ -16,7 +16,7 @@ textarea {
 }
 
 table {
-  font-size: 13px;
+  font-size: 12px;
 }
 
 th, td {
@@ -42,8 +42,10 @@ th, td {
   overflow-y: auto;
 }
 
-.btn-full {
-  width: 100%;
+.btn-half {
+  display: block;
+  width: 450px;
+  margin: auto;
 }
 
 .row {

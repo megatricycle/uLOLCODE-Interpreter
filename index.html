@@ -8,15 +8,15 @@
   <body ng-controller="AppController" class="ng-cloak" ng-cloak ng-class="{{show}}">
     <div class="row">
       <div class="col s4 upper-part">
-        <h5 class="center-text">Code</h5>
+        <h5>Code</h5>
         <div class="card-panel upper-panel no-padding">
           <div id="editor"></div>
         </div>
       </div>
       <div class="col s4 upper-part">
-        <h5 class="center-text">Lexemes</h5>
+        <h5>Lexemes</h5>
         <div class="card-panel upper-panel no-padding">
-          <table class="centered">
+          <table class="centered bordered">
             <thead>
               <tr>
                   <th>Lexeme</th>
@@ -34,12 +34,13 @@
         </div>
       </div>
       <div class="col s4 upper-part">
-        <h5 class="center-text">Symbol table</h5>
+        <h5>Symbol table</h5>
         <div class="card-panel upper-panel no-padding">
-          <table class="centered">
+          <table class="centered bordered">
             <thead>
               <tr>
                   <th>Identifier</th>
+                  <th>Type</th>
                   <th>Value</th>
               </tr>
             </thead>
@@ -47,6 +48,7 @@
             <tbody>
               <tr ng-repeat="symbol in symbolTable">
                 <td ng-cloak>{{symbol.identifier}}</td>
+                <td class="{{symbol.type.color}}" ng-cloak>{{symbol.type.text}}</td>
                 <td class="{{symbol.value.color}}" ng-cloak>{{symbol.value.text}}</td>
               </tr>
             </tbody>
@@ -55,7 +57,9 @@
       </div>
     </div>
     <div class="row">
-      <a href="#" class="btn btn-full waves-effect waves-light grey darken-4" ng-click="execute();">EXECUTE</a>
+      <div class="col s12">
+        <a href="#" class="btn btn-half waves-effect waves-light grey darken-4" ng-click="execute();">EXECUTE</a>
+      </div>
     </div>
     <div>
       <h5>Console</h5>

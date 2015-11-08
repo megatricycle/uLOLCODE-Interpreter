@@ -45,6 +45,9 @@ angular.module('app', []).controller('AppController', function($scope){
   $scope.console = [];
 
   $scope.execute = function(){
+    // display execution message
+    $scope.console.push({text: '> Parsing code.'});
+
     // clear values
     $scope.lexemes = [];
     $scope.symbolTable = [];
@@ -54,6 +57,9 @@ angular.module('app', []).controller('AppController', function($scope){
     var lines = code.split('\n');
 
     for(var i = 0; i < lines.length; i++){
+      // remove excess lines
+      lines[i] = lines[i].trim();
+
       // test
       if(/^\s*HAI\s*$/.test(lines[i])){
         $scope.lexemes.push({
@@ -61,7 +67,7 @@ angular.module('app', []).controller('AppController', function($scope){
             text: 'HAI',
             color: 'green-text'
           },
-          desc: 'Start'
+          desc: 'Keyword'
         });
       }
       else if(/^\s*KTHXBYE\s*$/.test(lines[i])){
@@ -70,7 +76,7 @@ angular.module('app', []).controller('AppController', function($scope){
             text: 'KTHXBYE',
             color: 'green-text'
           },
-          desc: 'End'
+          desc: 'Keyword'
         });
       }
       else if(/\s*I HAS A\s+/.test(lines[i])){
@@ -79,7 +85,7 @@ angular.module('app', []).controller('AppController', function($scope){
             text: 'I HAS A',
             color: 'green-text'
           },
-          desc: 'Variable Declaration'
+          desc: 'Keyword'
         });
 
         var identifier = lines[i].substr(8).trim();
@@ -90,13 +96,17 @@ angular.module('app', []).controller('AppController', function($scope){
             text: identifier,
             color: 'white-text'
           },
-          desc: 'Variable Identifier'
+          desc: 'Identifier'
         });
 
         // check if symbol already exists
         if($scope.symbolTable.indexOfAttr('identifier', identifier) == -1){
           $scope.symbolTable.push({
             identifier: identifier,
+            type: {
+              text: 'undefined',
+              color: 'red-text'
+            },
             value: {
               text: 'undefined',
               color: 'red-text'
@@ -107,7 +117,7 @@ angular.module('app', []).controller('AppController', function($scope){
     }
 
     // since it's still hardcoded, assume Success
-    $scope.console.push({text: '> Parsing success'});
+    $scope.console.push({text: '> Parsing success.'});
   };
 
   // scroll down on console update
