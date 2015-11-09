@@ -43,6 +43,7 @@ angular.module('app', []).controller('AppController', function($scope){
   $scope.lexemes = [];
   $scope.symbolTable = [];
   $scope.console = [];
+  $scope.lexemeIndex = 0;
 
   $scope.execute = function(){
     // display execution message
@@ -55,6 +56,9 @@ angular.module('app', []).controller('AppController', function($scope){
     // split by lines
     var code = ace.edit("editor").getValue();
     var lines = code.split('\n');
+    var identifier;
+
+    // get lexemes
 
     for(var i = 0; i < lines.length; i++){
       // remove excess lines
@@ -70,20 +74,43 @@ angular.module('app', []).controller('AppController', function($scope){
       else if(/\s*I HAS A\s+/.test(lines[i])){
         addLexeme('I HAS A', 'green-text', 'Variable declaration');
 
-        var identifier = lines[i].substr(8).trim();
+        identifier = lines[i].substr(8).trim();
 
         // add variable
         addLexeme(identifier, 'white-text', 'Variable identifier');
+      }
+      else if(/\s*GIMMEH\s+/.test(lines[i])){
+        addLexeme('GIMMEH', 'green-text', 'Input identifier');
 
-        // check if symbol already exists
-        if($scope.symbolTable.indexOfAttr('identifier', identifier) == -1){
-          addSymbol(identifier, 'undefined', 'red-text', 'undefined', 'red-text');
-        }
+        identifier = lines[i].substr(7).trim();
+
+        // add identifier
+        addLexeme(identifier, 'white-text', 'Variable identifier');
       }
     }
 
-    // since it's still hardcoded, assume Success
+    // parsing is successful if we manage to get to this code
     $scope.console.push({text: '> Parsing success.'});
+
+    $scope.checkSyntaxErrors();
+  };
+
+  $scope.checkSyntaxErrors = function(){
+    // check here
+
+    // success
+    $scope.run(0);
+  };
+
+  $scope.run = function(i){
+    // start running the program
+    for(; i < $scope.lexemes.length; i++){
+      if($scope.lexemes[i].lexeme.text == "I HAS A"){
+        var identifier = $scope.lexemes[++i].lexeme.text;
+
+        addSymbol(identifier, 'undefined', 'red-text', 'undefined', 'red-text');
+      }
+    }
   };
 
   // scroll down on console update
@@ -116,5 +143,17 @@ angular.module('app', []).controller('AppController', function($scope){
         color: valueColor
       }
     });
+  }
+
+  function editSymbol(identifier, typeText, typeColor, valueText, valueColor){
+    // get index of identifier
+    var index = $scope.symbolTable.indexOfAttr('identifier',  identifier);
+
+    if(index == -1) throw 'Invalid index';
+
+    $scope.symbolTable[index].type.text = typeText;
+    $scope.symbolTable[index].type.color = typeColor;
+    $scope.symbolTable[index].value.text = valueText;
+    $scope.symbolTable[index].value.color = valueColor;
   }
 });
