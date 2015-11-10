@@ -58,16 +58,22 @@
     </div>
     <div class="row">
       <div class="col s12">
-        <a href="#" class="btn btn-half waves-effect waves-light grey darken-4" ng-click="execute();">EXECUTE</a>
+        <a href="#" class="btn btn-half waves-effect waves-light grey darken-4 {{disabled()}}" ng-click="execute();">{{buttonText()}}</a>
       </div>
     </div>
     <div>
       <h5>Console</h5>
       <div class="card-panel console-panel">
         <div class="console">
-          <p class="no-margin" ng-repeat="line in console" ng-cloak>{{line.text}}</p>
+          <ul class="console-list">
+            <li ng-repeat="line in console"><p class="no-margin" ng-cloak>{{line.text}}</p></li>
+            <li>
+              <form ng-submit="input()">
+                > <input id="input" type="text" ng-focus="focusInput()"/>
+              </form>
+            </li>
+          </ul>
         </div>
-        > <input id="input" type="text"/>
       </div>
     </div>
 

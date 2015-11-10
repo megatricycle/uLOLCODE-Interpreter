@@ -44,14 +44,27 @@ angular.module('app', []).controller('AppController', function($scope){
   $scope.symbolTable = [];
   $scope.console = [];
   $scope.lexemeIndex = 0;
+  $scope.state = "idle";
+  $scope.identifier = null;
+  $scope.buttonText = function(){
+    if($scope.state == "input") return "RUNNING";
+    return "EXECUTE";
+  };
+  $scope.disabled = function(){
+    if($scope.state == "input") return "disabled";
+    return "";
+  };
 
   $scope.execute = function(){
-    // display execution message
-    $scope.console.push({text: '> Parsing code.'});
+    // disallow execute on input mode
+    if($scope.state == "input") return;
 
     // clear values
     $scope.lexemes = [];
     $scope.symbolTable = [];
+
+    // set lexemeIndex
+    $scope.lexemeIndex = 0;
 
     // split by lines
     var code = ace.edit("editor").getValue();
@@ -90,8 +103,6 @@ angular.module('app', []).controller('AppController', function($scope){
     }
 
     // parsing is successful if we manage to get to this code
-    $scope.console.push({text: '> Parsing success.'});
-
     $scope.checkSyntaxErrors();
   };
 
@@ -103,20 +114,100 @@ angular.module('app', []).controller('AppController', function($scope){
   };
 
   $scope.run = function(i){
-    // start running the program
-    for(; i < $scope.lexemes.length; i++){
-      if($scope.lexemes[i].lexeme.text == "I HAS A"){
-        var identifier = $scope.lexemes[++i].lexeme.text;
+    var identifier;
 
-        addSymbol(identifier, 'undefined', 'red-text', 'undefined', 'red-text');
+    // start running the program
+    for(; i < $scope.lexemes.length; i++, $scope.lexemeIndex++){
+      if($scope.lexemes[i].lexeme.text == "I HAS A"){
+        identifier = $scope.lexemes[++i].lexeme.text;
+        $scope.lexemeIndex++;
+
+        addSymbol(identifier, 'NOOB', 'red-text', 'NOOB', 'red-text');
       }
+      else if($scope.lexemes[i].lexeme.text == "GIMMEH"){
+        identifier = $scope.lexemes[++i].lexeme.text;
+        $scope.lexemeIndex++;
+
+        // wait for input
+        $('#input').focus();
+
+        // set state to waiting for input
+        $scope.state = "input";
+
+        // set identifier
+        $scope.identifier = identifier;
+
+        // break run
+        return;
+      }
+    }
+
+    // end of program
+    $scope.state = "idle";
+  };
+
+  $scope.input = function(){
+    var identifier = $scope.identifier;
+    var value = $('#input').val();
+    var typeText;
+    var typeColor;
+    var valueText;
+    var valueColor;
+
+    // add to console
+    $scope.console.push({text: '> '+value});
+
+    if(!value){
+      typeText = 'NOOB';
+      typeColor = 'red-text';
+      valueText = 'NOOB';
+      valueColor = 'red-text';
+    }
+    else if(/^\d+$/.test(value)){
+      typeText = 'NUMBR';
+      typeColor = 'yellow-text';
+      valueText = value;
+      valueColor = 'white-text';
+    }
+    else if(/^\d+\.\d+$/.test(value)){
+      // NUMBARs
+      typeText = 'NUMBAR';
+      typeColor = 'yellow-text';
+      valueText = value;
+      valueColor = 'white-text';
+    }
+    else{
+      typeText = 'YARN';
+      typeColor = 'yellow-text';
+      valueText = '"' + value + '"';
+      valueColor = 'blue-text';
+      // YARN
+    }
+
+    editSymbol(identifier, typeText, typeColor, valueText, valueColor);
+
+    // clear value
+    $('#input').val('');
+    $('#input').blur();
+
+    $scope.run(++$scope.lexemeIndex);
+  };
+
+  $scope.focusInput = function(){
+    if($scope.state != "input"){
+      $('#input').blur();
     }
   };
 
   // scroll down on console update
   $scope.$watch(function(){
-    return $('.console').children().length;
+    return $('.console-list').children().length;
   }, function(){
+    $('.console').scrollTop($('.console')[0].scrollHeight);
+  });
+
+  // scroll down on keypres
+  $('#input').on('keypress', function(){
     $('.console').scrollTop($('.console')[0].scrollHeight);
   });
 
