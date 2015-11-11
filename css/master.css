@@ -56,25 +56,35 @@ th, td {
   height: 140px;
   font-family: Courier;
   padding: 10px;
+  overflow: auto;
+}
+
+.console {
+  height: 120px;
+  overflow-y: auto;
+}
+
+.console-list {
+  margin: 0;
+}
+
+.console form {
+  margin: 0;
 }
 
 #input {
-  height: 25px;
+  height: 21px;
   width: 900px;
   border: none !important;
   border-bottom: none !important;
   box-shadow: none;
+  margin: 0;
 }
 
 #input:focus {
   border: none !important;
   border-bottom: none !important;
   box-shadow: none;
-}
-
-.console {
-  height: 105px;
-  overflow-y: auto;
 }
 
 .no-padding {
@@ -95,6 +105,14 @@ th, td {
 
 .red-text {
   color: #55b5db;
+}
+
+.blue-text {
+  color: #2592db;
+}
+
+.yellow-text {
+  color: #d9c163;
 }
 
 .ng-cloak {
