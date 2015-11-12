@@ -78,6 +78,7 @@ angular.module('app', []).controller('AppController', function($scope){
     // clear values
     $scope.lexemes = [];
     $scope.symbolTable = [];
+    $scope.variables = [];
 
     // set lexemeIndex
     $scope.lexemeIndex = 0;
@@ -100,6 +101,41 @@ angular.module('app', []).controller('AppController', function($scope){
       else if(/^\s*KTHXBYE\s*$/.test(lines[i])){
         addLexeme('KTHXBYE', 'green-text', 'Code Delimeter');
       }
+      else if(/^\s*VISIBLE\s*/.test(lines[i])){
+        addLexeme('VISIBLE', 'green-text', 'Output Keyword');
+        //string literal
+        if(/^\s*VISIBLE\s*".*"*$/.test(lines[i])){
+          addLexeme('"', 'BLUE-text', 'String Delimiter');
+          var string = lines[i].substring(lines[i].indexOf('"') + 1, lines[i].length - 1);
+          addLexeme(string, 'blue-text', 'String Literal');
+          addLexeme('"', 'blue-text', 'String Delimiter');
+          printToConsole(string);
+        }
+        //integer
+        else if(/^\s*VISIBLE\s*[0-9]*\s*$/.test(lines[i])){
+          var integer = lines[i].substring(lines[i].indexOf('E') + 2);
+          addLexeme(integer, 'white-text', 'Integer Literal');
+          integer = integer.trim();
+          printToConsole(integer);
+        }
+        //win
+        else if(/^\s*VISIBLE\s*WIN\s*$/.test(lines[i])){
+          addLexeme('WIN', 'white-text', 'Boolean Literal');
+          printToConsole('WIN');
+        }
+        //fail
+        else if(/^\s*VISIBLE\s*FAIL\s*$/.test(lines[i])){
+          addLexeme('FAIL', 'white-text', 'Boolean Literal');
+          printToConsole('FAIL');
+        }
+        //variable
+        else if(/^\s*VISIBLE\s*.*$/.test(lines[i])){
+          var identifier = lines[i].substring(lines[i].indexOf('E') + 2);
+          addLexeme(identifier, 'white-text', 'Variable Identifier');
+          identifier = identifier.trim();
+          printToConsole($scope.variables[identifier]);
+        }
+      }
       else if(/\s*I HAS A\s+/.test(lines[i])){
         addLexeme('I HAS A', 'green-text', 'Variable Declaration');
 
@@ -116,7 +152,6 @@ angular.module('app', []).controller('AppController', function($scope){
 
           // get identifier
           identifier = identifier.substring(0, index).trim();
-
           // identify type of value
           var type;
 
@@ -155,15 +190,19 @@ angular.module('app', []).controller('AppController', function($scope){
           switch(type){
             case 'NOOB':
               addLexeme(value, 'yellow-text', 'Null Literal');
+              $scope.variables[identifier] = value;
               break;
             case 'TROOF':
               addLexeme(value, 'red-text', 'Boolean Literal');
+              $scope.variables[identifier] = value;
               break;
             case 'NUMBR':
               addLexeme(value, 'white-text', 'Integer Literal');
+              $scope.variables[identifier] = value;
               break;
             case 'NUMBAR':
               addLexeme(value, 'white-text', 'Float Literal');
+              $scope.variables[identifier] = value;
               break;
             case 'YARN':
               // omit string delimeters
@@ -171,6 +210,7 @@ angular.module('app', []).controller('AppController', function($scope){
               addLexeme('"', 'blue-text', 'String Delimeter');
               addLexeme(value, 'blue-text', 'String Literal');
               addLexeme('"', 'blue-text', 'String Delimeter');
+              $scope.variables[identifier] = value;
               break;
           }
         }
