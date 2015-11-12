@@ -1,6 +1,9 @@
 // @TODO:
-// STRING LITERALS DONT RESPECT WHITESPACES
+// STRING LITERALS DONT RESPECT WHITESPACES (kasalanan ng javascript)
 // SYNTAX ERRORS
+// COMMENTS
+// CONCATENATION
+// ASSIGNMENT
 
 
 // define regex here
@@ -12,6 +15,8 @@ var regex = {
   'YARN': /^".*"$/,
   'variable': /^[A-Za-z][A-Za-z0-9_]*$/
 };
+
+var editor;
 
 $(document).ready(function(){
   var remote = require('remote');
@@ -44,7 +49,7 @@ $(document).ready(function(){
   Menu.setApplicationMenu(menu);
 
   // set editor
-  var editor = ace.edit("editor");
+  editor = ace.edit("editor");
   editor.setTheme("ace/theme/terminal");
 
   // listen for possible file read
@@ -91,10 +96,35 @@ angular.module('app', []).controller('AppController', function($scope){
     var identifier;
 
     // get lexemes
+    var ignore = false;
 
     for(var i = 0; i < lines.length; i++){
+      var hasComment = false;
+
       // remove excess lines
       lines[i] = lines[i].trim();
+
+      // top level keyword checker
+      if(/\s*TLDR\s*$/.test(lines[i])){
+        // set ignore to false
+        ignore = false;
+
+        // add lexeme
+        addLexeme('TLDR', 'grey-text', 'Comment Delimiter');
+      }
+
+      // strip comments
+      if(/\s+BTW\s*/.test(lines[i])){
+        // remove btw
+        lines[i] = lines[i].substring(0, lines[i].indexOf('BTW')).trim();
+
+        hasComment = true;
+      }
+
+      // proceed to new line if comment mode
+      if(ignore){
+        continue;
+      }
 
       var operator1;
       var operator2;
@@ -151,11 +181,81 @@ angular.module('app', []).controller('AppController', function($scope){
       else if(/\s*GIMMEH\s+/.test(lines[i])){
         addLexeme('GIMMEH', 'green-text', 'Input Identifier');
 
-        // remove whitespaces
+        // get string to concat
         identifier = lines[i].substr(7).trim();
 
         // add identifier
         addLexeme(identifier, 'white-text', 'Variable Identifier');
+      }
+      else if(/\s*[A-Za-z][A-Za-z0-9_]*\s+R\s+.+\s*$/.test(lines[i])){
+
+        var identifier = lines[i].split(' R ');
+
+        //variable
+        addLexeme(identifier[0], 'white-text', 'Variable Identifier');
+
+        addLexeme('R', 'green-text', 'Assignment Statement');
+
+        //value
+        addLexemeLiteral(identifier[1], checkLiteral(identifier[1]));
+
+      }
+      //smoosh
+      else if(/\s*SMOOSH\s+/.test(lines[i])){
+        addLexeme('SMOOSH', 'green-text', 'String Concatenation');
+
+        if(/\s*SMOOSH\s+".+"\s+AN\s+".+"\s*/.test(lines[i])){
+          // remove smoosh
+          var identifier = lines[i].substring(lines[i].indexOf('"'));
+          //split
+          identifier = identifier.split("AN");
+
+          identifier[0] = identifier[0].substr(identifier[0].indexOf('"'), identifier[0].length - 1);
+          addLexemeLiteral(identifier[0], 'YARN');
+          addLexeme('AN', 'green-text', 'String Delimiter');
+
+          identifier[1] = identifier[1].substr(identifier[1].indexOf('"'), identifier[1].length - 1);
+          addLexemeLiteral(identifier[1], 'YARN');
+        }
+        else if(/\s*SMOOSH\s+".+"\s+AN\s+\S+\s*/.test(lines[i])){
+            //remove smoosh
+            var identifier = lines[i].substring(lines[i].indexOf('"'));
+
+            identifier = identifier.split("AN");
+
+            identifier[0] = identifier[0].substr(identifier[0].indexOf('"'), identifier[0].length - 1);
+            addLexemeLiteral(identifier[0], 'YARN');
+            addLexeme('AN', 'green-text', 'String Delimiter');
+            addLexeme(identifier[1], 'white-text', 'Variable identifier');
+        }
+        else if(/\s*SMOOSH\s+\S+\s+AN\s+".+"\s*/.test(lines[i])){
+            //remove smoosh
+            var identifier = lines[i].substring(lines[i].indexOf('H') + 1);
+
+            identifier = identifier.split("AN");
+            addLexeme(identifier[0], 'white-text', 'Variable identifier');
+            addLexeme('AN', 'green-text', 'String Delimiter');
+            identifier[1] = identifier[1].substr(identifier[1].indexOf('"'), identifier[1].length - 1);
+            addLexemeLiteral(identifier[1], 'YARN');
+        }
+        else if(/\s*SMOOSH\s+\S+\s+AN\s+\S+\s*/.test(lines[i])){
+            //remove smoosh
+            var identifier = lines[i].substring(lines[i].indexOf('H') + 1);
+
+            identifier = identifier.split("AN");
+
+            addLexeme(identifier[0], 'white-text', 'Variable identifier');
+            addLexeme('AN', 'green-text', 'String Delimiter');
+            addLexeme(identifier[1], 'white-text', 'Variable identifier');
+        }
+      }
+      // comment
+      else if(/\s*OBTW\s*.*$/.test(lines[i])){
+        // set ignore to true
+        ignore = true;
+
+        // add lexeme
+        addLexeme('OBTW', 'grey-text', 'Comment Delimiter');
       }
       // arithmetic operations
       else if(/\s*SUM OF\s+/.test(lines[i])){
@@ -323,6 +423,11 @@ angular.module('app', []).controller('AppController', function($scope){
         addLexeme(lines[i], 'red-text', 'Unknown Keyword');
       }
 
+      // add comment lexeme if it has
+      if(hasComment){
+        // add btw lexeme
+        addLexeme('BTW', 'grey-text', 'Comment');
+      }
     }
 
     // parsing is successful if we manage to get to this code
@@ -518,6 +623,12 @@ angular.module('app', []).controller('AppController', function($scope){
 
     // end of program
     $scope.state = "idle";
+
+    // focus editor
+    editor.focus();
+    session = editor.getSession();
+    count = session.getLength();
+    editor.gotoLine(count, session.getLine(count-1).length);
   };
 
   $scope.input = function(){
@@ -557,6 +668,13 @@ angular.module('app', []).controller('AppController', function($scope){
   $('#input').on('keypress', function(){
     $('.console').scrollTop($('.console')[0].scrollHeight);
   });
+
+  // ctrl + enter
+  $scope.ctrlEnter = function(e){
+    if(e.ctrlKey && e.keyCode == 13){
+      $scope.execute();
+    }
+  };
 
   // helper functions
   function addLexeme(text, color, desc){
