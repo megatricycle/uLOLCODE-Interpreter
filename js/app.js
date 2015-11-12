@@ -1,6 +1,9 @@
 // @TODO:
-// STRING LITERALS DONT RESPECT WHITESPACES
+// STRING LITERALS DONT RESPECT WHITESPACES (kasalanan ng javascript)
 // SYNTAX ERRORS
+// COMMENTS
+// CONCATENATION
+// ASSIGNMENT
 
 
 // define regex here
@@ -11,6 +14,8 @@ var regex = {
   'NUMBAR': /^-?\d+\.\d+$/,
   'YARN': /^".*"$/
 };
+
+var editor;
 
 $(document).ready(function(){
   var remote = require('remote');
@@ -43,7 +48,7 @@ $(document).ready(function(){
   Menu.setApplicationMenu(menu);
 
   // set editor
-  var editor = ace.edit("editor");
+  editor = ace.edit("editor");
   editor.setTheme("ace/theme/terminal");
 
   // listen for possible file read
@@ -90,10 +95,35 @@ angular.module('app', []).controller('AppController', function($scope){
     var identifier;
 
     // get lexemes
+    var ignore = false;
 
     for(var i = 0; i < lines.length; i++){
+      var hasComment = false;
+
       // remove excess lines
       lines[i] = lines[i].trim();
+
+      // top level keyword checker
+      if(/\s*TLDR\s*$/.test(lines[i])){
+        // set ignore to false
+        ignore = false;
+
+        // add lexeme
+        addLexeme('TLDR', 'grey-text', 'Comment Delimiter');
+      }
+
+      // strip comments
+      if(/\s+BTW\s*/.test(lines[i])){
+        // remove btw
+        lines[i] = lines[i].substring(0, lines[i].indexOf('BTW')).trim();
+
+        hasComment = true;
+      }
+
+      // proceed to new line if comment mode
+      if(ignore){
+        continue;
+      }
 
       var operator1;
       var operator2;
@@ -155,6 +185,14 @@ angular.module('app', []).controller('AppController', function($scope){
 
         // add identifier
         addLexeme(identifier, 'white-text', 'Variable Identifier');
+      }
+      // comment
+      else if(/\s*OBTW\s*.*$/.test(lines[i])){
+        // set ignore to true
+        ignore = true;
+
+        // add lexeme
+        addLexeme('OBTW', 'grey-text', 'Comment Delimiter');
       }
       // arithmetic operations
       else if(/\s*SUM OF\s+/.test(lines[i])){
@@ -319,6 +357,11 @@ angular.module('app', []).controller('AppController', function($scope){
         addLexemeLiteral(operator2.value, operator2.type);
       }
 
+      // add comment lexeme if it has
+      if(hasComment){
+        // add btw lexeme
+        addLexeme('BTW', 'grey-text', 'Comment');
+      }
     }
 
     // parsing is successful if we manage to get to this code
@@ -476,6 +519,12 @@ angular.module('app', []).controller('AppController', function($scope){
 
     // end of program
     $scope.state = "idle";
+
+    // focus editor
+    editor.focus();
+    session = editor.getSession();
+    count = session.getLength();
+    editor.gotoLine(count, session.getLine(count-1).length);
   };
 
   $scope.input = function(){
@@ -515,6 +564,13 @@ angular.module('app', []).controller('AppController', function($scope){
   $('#input').on('keypress', function(){
     $('.console').scrollTop($('.console')[0].scrollHeight);
   });
+
+  // ctrl + enter
+  $scope.ctrlEnter = function(e){
+    if(e.ctrlKey && e.keyCode == 13){
+      $scope.execute();
+    }
+  };
 
   // helper functions
   function addLexeme(text, color, desc){
