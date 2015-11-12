@@ -1,6 +1,8 @@
 // @TODO:
-// VISIBLE
+// VISIBLE FIX LITERAL COLORS
+// STRING LITERALS DONT RESPECT WHITESPACES
 // SYNTAX ERRORS
+
 
 // define regex here
 var regex = {
@@ -78,6 +80,7 @@ angular.module('app', []).controller('AppController', function($scope){
     // clear values
     $scope.lexemes = [];
     $scope.symbolTable = [];
+    $scope.variables = [];
 
     // set lexemeIndex
     $scope.lexemeIndex = 0;
@@ -103,6 +106,14 @@ angular.module('app', []).controller('AppController', function($scope){
       else if(/^\s*KTHXBYE\s*$/.test(lines[i])){
         addLexeme('KTHXBYE', 'green-text', 'Code Delimeter');
       }
+      else if(/^\s*VISIBLE\s*/.test(lines[i])){
+        addLexeme('VISIBLE', 'green-text', 'Output Keyword');
+
+        identifier = lines[i].substr(8).trim();
+        type = checkLiteral(identifier);
+
+        addLexemeLiteral(identifier, type);
+      }
       else if(/\s*I HAS A\s+/.test(lines[i])){
         addLexeme('I HAS A', 'green-text', 'Variable Declaration');
 
@@ -119,7 +130,6 @@ angular.module('app', []).controller('AppController', function($scope){
 
           // get identifier
           identifier = identifier.substring(0, index).trim();
-
           // identify type of value
           var type = checkLiteral(value);
 
@@ -317,17 +327,35 @@ angular.module('app', []).controller('AppController', function($scope){
   };
 
   $scope.checkSyntaxErrors = function(){
-    // check here
+    //checking if the first delimiter is HAI
+
+    if(!(/^\s*HAI\s*$/.test($scope.lexemes[0].lexeme.text))){
+      $scope.console.push({text: '> Syntax Error: Expected delimiter: HAI on line 1'});
+      return;
+    } //checking if the last delimiter is KTHXBYE
+    else if(!(/^\s*KTHXBYE\s*$/.test($scope.lexemes[($scope.lexemes.length)-1].lexeme.text))){
+      $scope.console.push({text: '> Syntax Error: Expected delimiter: KTHXBYE on line ' + (($scope.lexemes.length)-1)});
+      return;
+    }
+
+    // for(var i=1; i<($scope.lexemes.length)-2; i++){
+    //   /*if(().test($scope.lexemes[i].lexeme.text)){
+    //
+    //   }*/
+    // }
 
     // success
     $scope.run(0);
   };
 
   $scope.run = function(i){
-    var identifier;
-
     // start running the program
     for(; i < $scope.lexemes.length; i++, $scope.lexemeIndex++){
+      var value;
+      var identifier;
+      var symbol;
+      var typeText;
+
       if($scope.lexemes[i].lexeme.text == "I HAS A"){
         identifier = $scope.lexemes[++i].lexeme.text;
         $scope.lexemeIndex++;
@@ -353,10 +381,9 @@ angular.module('app', []).controller('AppController', function($scope){
       else if($scope.lexemes[i].lexeme.text == 'ITZ'){
         // get identifier and value
         identifier = $scope.lexemes[(i - 1)].lexeme.text;
-        var value = $scope.lexemes[++i].lexeme.text;
+        value = $scope.lexemes[++i].lexeme.text;
         $scope.lexemeIndex++;
 
-        var typeText;
         var valueColor;
 
         // identify typeText
@@ -392,7 +419,7 @@ angular.module('app', []).controller('AppController', function($scope){
         else{
           // variable
           // get symbol object
-          var symbol = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', value)];
+          symbol = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', value)];
 
           typeText = symbol.type.text;
           value = symbol.value.text;
@@ -401,6 +428,50 @@ angular.module('app', []).controller('AppController', function($scope){
 
         // edit symbol
         editSymbol(identifier, typeText, 'yellow-text', value, valueColor);
+      }
+      else if($scope.lexemes[i].lexeme.text == 'VISIBLE'){
+        value = $scope.lexemes[++i].lexeme.text;
+        $scope.lexemeIndex++;
+        var type = checkLiteral(value);
+
+       switch(type){
+          case 'TROOF':
+            if(value == 'WIN') printToConsole('WIN');
+            else printToConsole('FAIL');
+            break;
+          case 'NOOB':
+          case 'NUMBR':
+          case 'NUMBAR':
+            printToConsole(value);
+            break;
+          case 'YARN':
+            printToConsole($scope.lexemes[++i].lexeme.text);
+            i++;
+            $scope.lexemeIndex += 2;
+            break;
+          case 'variable':
+            symbol = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', value)];
+
+            typeText = symbol.type.text;
+            value = symbol.value.text;
+
+            switch(typeText){
+              case 'TROOF':
+                if(value == 'WIN') printToConsole('WIN');
+                else printToConsole('FAIL');
+                break;
+              case 'NOOB':
+              case 'NUMBR':
+              case 'NUMBAR':
+                printToConsole(value);
+                break;
+              case 'YARN':
+                printToConsole(value.substr(1, value.length - 2));
+                break;
+            }
+
+            break;
+       }
       }
     }
 
@@ -506,7 +577,7 @@ angular.module('app', []).controller('AppController', function($scope){
       // NUMBAR
       return 'NUMBAR';
     }
-    else if(regex.YARN.test(value)){
+    else if(regex.YARN.test(value) || value == '"'){
       // YARN
       return 'YARN';
     }
