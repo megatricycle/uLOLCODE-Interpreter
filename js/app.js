@@ -103,7 +103,7 @@ angular.module('app', []).controller('AppController', function($scope){
       }
       else if(/^\s*VISIBLE\s*/.test(lines[i])){
         addLexeme('VISIBLE', 'green-text', 'Output Keyword');
-        //string literal
+        //print string literal
         if(/^\s*VISIBLE\s*".*"*$/.test(lines[i])){
           addLexeme('"', 'BLUE-text', 'String Delimiter');
           var string = lines[i].substring(lines[i].indexOf('"') + 1, lines[i].length - 1);
@@ -111,24 +111,24 @@ angular.module('app', []).controller('AppController', function($scope){
           addLexeme('"', 'blue-text', 'String Delimiter');
           printToConsole(string);
         }
-        //integer
+        //print integer
         else if(/^\s*VISIBLE\s*[0-9]*\s*$/.test(lines[i])){
           var integer = lines[i].substring(lines[i].indexOf('E') + 2);
           addLexeme(integer, 'white-text', 'Integer Literal');
           integer = integer.trim();
           printToConsole(integer);
         }
-        //win
+        //print win
         else if(/^\s*VISIBLE\s*WIN\s*$/.test(lines[i])){
           addLexeme('WIN', 'white-text', 'Boolean Literal');
           printToConsole('WIN');
         }
-        //fail
+        //print fail
         else if(/^\s*VISIBLE\s*FAIL\s*$/.test(lines[i])){
           addLexeme('FAIL', 'white-text', 'Boolean Literal');
           printToConsole('FAIL');
         }
-        //variable
+        //print variable
         else if(/^\s*VISIBLE\s*.*$/.test(lines[i])){
           var identifier = lines[i].substring(lines[i].indexOf('E') + 2);
           addLexeme(identifier, 'white-text', 'Variable Identifier');
