@@ -419,6 +419,7 @@ angular.module('app', []).controller('AppController', function($scope){
         addLexeme('AN', 'green-text', 'Operand Separator');
         addLexemeLiteral(operator2.value, operator2.type);
       }
+      else if(/\s*TLDR\s*$/.test(lines[i])){}
       else{
         addLexeme(lines[i], 'red-text', 'Unknown Keyword');
       }
@@ -461,7 +462,7 @@ angular.module('app', []).controller('AppController', function($scope){
         else if($scope.lexemes[i].lexeme.text == "GIMMEH"){
           identifier = $scope.lexemes[++i].lexeme.text;
 
-          if(!(regex.variable.test($scope.lexemes[++i].lexeme.text))){
+          if(!(regex.variable.test(identifier))){
             $scope.console.push({text: '> SYNTAX ERROR: Invalid variable on line '});
             return;
           }
@@ -481,6 +482,14 @@ angular.module('app', []).controller('AppController', function($scope){
         }
 
         else if($scope.lexemes[i].lexeme.text == "AN"){
+            // checks if value is string, number, numbar
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "OBTW"){
+            // checks if value is string, number, numbar
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "TLDR"){
             // checks if value is string, number, numbar
         }
         else if($scope.lexemes[i].desc == "Unknown Keyword"){
