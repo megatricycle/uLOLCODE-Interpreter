@@ -9,7 +9,8 @@ var regex = {
   'TROOF': /^(WIN|FAIL)$/,
   'NUMBR': /^-?\d+$/,
   'NUMBAR': /^-?\d+\.\d+$/,
-  'YARN': /^".*"$/
+  'YARN': /^".*"$/,
+  'variable': /^[A-Za-z][A-Za-z0-9_]*$/
 };
 
 $(document).ready(function(){
@@ -318,6 +319,9 @@ angular.module('app', []).controller('AppController', function($scope){
         addLexeme('AN', 'green-text', 'Operand Separator');
         addLexemeLiteral(operator2.value, operator2.type);
       }
+      else{
+        addLexeme(lines[i], 'red-text', 'Unknown Keyword');
+      }
 
     }
 
@@ -326,26 +330,64 @@ angular.module('app', []).controller('AppController', function($scope){
   };
 
   $scope.checkSyntaxErrors = function(){
-    //checking if the first delimiter is HAI
+      //checking if the first delimiter is HAI
+      if(!(/^\s*HAI\s*$/.test($scope.lexemes[0].lexeme.text))){
+        $scope.console.push({text: '> SYNTAX ERROR: Expected delimiter: HAI on line 1'});
+        return;
+      } //checking if the last delimiter is KTHXBYE
+      else if(!(/^\s*KTHXBYE\s*$/.test($scope.lexemes[($scope.lexemes.length)-1].lexeme.text))){
+        $scope.console.push({text: '> SYNTAX ERROR: Expected delimiter: KTHXBYE on last line'});
+        return;
+      }
 
-    if(!(/^\s*HAI\s*$/.test($scope.lexemes[0].lexeme.text))){
-      $scope.console.push({text: '> Syntax Error: Expected delimiter: HAI on line 1'});
-      return;
-    } //checking if the last delimiter is KTHXBYE
-    else if(!(/^\s*KTHXBYE\s*$/.test($scope.lexemes[($scope.lexemes.length)-1].lexeme.text))){
-      $scope.console.push({text: '> Syntax Error: Expected delimiter: KTHXBYE on line ' + (($scope.lexemes.length)-1)});
-      return;
-    }
+      //loop for all variables
+      for(var i=1; i<($scope.lexemes.length)-1; i++){
+        var identifier;
 
-    // for(var i=1; i<($scope.lexemes.length)-2; i++){
-    //   /*if(().test($scope.lexemes[i].lexeme.text)){
-    //
-    //   }*/
-    // }
+        if($scope.lexemes[i].lexeme.text == "I HAS A"){
+          identifier = $scope.lexemes[++i].lexeme.text;
 
-    // success
-    $scope.run(0);
-  };
+          if(!(regex.variable.test(identifier))){
+            $scope.console.push({text: '> SYNTAX ERROR: Invalid variable on line ' });
+            return;
+          }
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "GIMMEH"){
+          identifier = $scope.lexemes[++i].lexeme.text;
+
+          if(!(regex.variable.test($scope.lexemes[++i].lexeme.text))){
+            $scope.console.push({text: '> SYNTAX ERROR: Invalid variable on line '});
+            return;
+          }
+          /*else if($scope.symbolTable.indexOfAttr('identifier', identifier) == -1){
+            //check if the variable is present in the lexemes
+            printToConsole('> SYNTAX ERROR: Variable does not exist.')
+            return;
+          }*/
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "ITZ"){
+            // checks if value is string, number, numbar
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "R"){
+            // checks if value is string, number, numbar
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "AN"){
+            // checks if value is string, number, numbar
+        }
+        else if($scope.lexemes[i].desc == "Unknown Keyword"){
+            // checks if value is string, number, numbar
+            printToConsole('> SYNTAX ERROR: Unknown keyword on line ' + i);
+            return;
+        }
+      }
+
+      $scope.console.push({text: '> Execution successful.'});
+  }
+
 
   $scope.run = function(i){
     // start running the program
@@ -580,7 +622,7 @@ angular.module('app', []).controller('AppController', function($scope){
       // YARN
       return 'YARN';
     }
-    else{
+    else if(regex.variable.test(value)){
       // variable
       return 'variable';
     }
