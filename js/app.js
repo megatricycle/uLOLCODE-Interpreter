@@ -88,6 +88,8 @@ angular.module('app', []).controller('AppController', function($scope){
     var lines = code.split('\n');
     var identifier;
 
+
+
     // get lexemes
 
     for(var i = 0; i < lines.length; i++){
@@ -235,7 +237,22 @@ angular.module('app', []).controller('AppController', function($scope){
   };
 
   $scope.checkSyntaxErrors = function(){
-    // check here
+    //checking if the first delimiter is HAI
+
+    if(!(/^\s*HAI\s*$/.test($scope.lexemes[0].lexeme.text))){
+      $scope.console.push({text: '> Syntax Error: Expected delimiter: HAI on line 1'});
+      return;
+    } //checking if the last delimiter is KTHXBYE
+    else if(!(/^\s*KTHXBYE\s*$/.test($scope.lexemes[($scope.lexemes.length)-1].lexeme.text))){
+      $scope.console.push({text: '> Syntax Error: Expected delimiter: KTHXBYE on line ' + (($scope.lexemes.length)-1)});
+      return;
+    }
+
+    for(var i=1; i<($scope.lexemes.length)-2; i++){
+      /*if(().test($scope.lexemes[i].lexeme.text)){
+
+      }*/
+    }
 
     // success
     $scope.run(0);
