@@ -1,6 +1,6 @@
 // @TODO:
-// Negative NUMBR/NUMBAR
-// Initializing with variable
+// VISIBLE
+// SYNTAX ERRORS
 
 // define regex here
 var regex = {
@@ -93,6 +93,9 @@ angular.module('app', []).controller('AppController', function($scope){
       // remove excess lines
       lines[i] = lines[i].trim();
 
+      var operator1;
+      var operator2;
+
       // check keyword
       if(/^\s*HAI\s*$/.test(lines[i])){
         addLexeme('HAI', 'green-text', 'Code Delimeter');
@@ -118,31 +121,7 @@ angular.module('app', []).controller('AppController', function($scope){
           identifier = identifier.substring(0, index).trim();
 
           // identify type of value
-          var type;
-
-          if(regex.NOOB.test(value)){
-            // NOOB
-            type = 'NOOB';
-          }
-          else if(regex.TROOF.test(value)){
-            // TROOF
-            type = 'TROOF';
-          }
-          else if(regex.NUMBR.test(value)){
-            // NUMBR
-            type = 'NUMBR';
-          }
-          else if(regex.NUMBAR.test(value)){
-            // NUMBAR
-            type = 'NUMBAR';
-          }
-          else if(regex.YARN.test(value)){
-            // YARN
-            type = 'YARN';
-          }
-          else{
-            // variable
-          }
+          var type = checkLiteral(value);
 
           // add lexemes
           // identifier
@@ -152,27 +131,7 @@ angular.module('app', []).controller('AppController', function($scope){
           addLexeme('ITZ', 'green-text', 'Variable Assignment');
 
           // add value
-          switch(type){
-            case 'NOOB':
-              addLexeme(value, 'yellow-text', 'Null Literal');
-              break;
-            case 'TROOF':
-              addLexeme(value, 'red-text', 'Boolean Literal');
-              break;
-            case 'NUMBR':
-              addLexeme(value, 'white-text', 'Integer Literal');
-              break;
-            case 'NUMBAR':
-              addLexeme(value, 'white-text', 'Float Literal');
-              break;
-            case 'YARN':
-              // omit string delimeters
-              value = value.substring(1, value.length - 1);
-              addLexeme('"', 'blue-text', 'String Delimeter');
-              addLexeme(value, 'blue-text', 'String Literal');
-              addLexeme('"', 'blue-text', 'String Delimeter');
-              break;
-          }
+          addLexemeLiteral(value, type);
         }
         else{
           // add variable
@@ -188,6 +147,169 @@ angular.module('app', []).controller('AppController', function($scope){
         // add identifier
         addLexeme(identifier, 'white-text', 'Variable Identifier');
       }
+      // arithmetic operations
+      else if(/\s*SUM OF\s+/.test(lines[i])){
+        addLexeme('SUM OF', 'green-text', 'Addition Operator');
+
+        // remove whitespaces
+        operators = lines[i].substr(7).trim();
+
+        operators = operators.split(' AN ');
+
+        operator1 = {
+          value: operators[0].trim(),
+          type: checkLiteral(operators[0].trim())
+        };
+
+        operator2 = {
+          value: operators[1].trim(),
+          type: checkLiteral(operators[1].trim())
+        };
+
+        // add lexemes
+        addLexemeLiteral(operator1.value, operator1.type);
+        addLexeme('AN', 'green-text', 'Operand Separator');
+        addLexemeLiteral(operator2.value, operator2.type);
+      }
+      else if(/\s*DIFF OF\s+/.test(lines[i])){
+        addLexeme('DIFF OF', 'green-text', 'Subtraction Operator');
+
+        // remove whitespaces
+        operators = lines[i].substr(8).trim();
+
+        operators = operators.split(' AN ');
+
+        operator1 = {
+          value: operators[0].trim(),
+          type: checkLiteral(operators[0].trim())
+        };
+
+        operator2 = {
+          value: operators[1].trim(),
+          type: checkLiteral(operators[1].trim())
+        };
+
+        // add lexemes
+        addLexemeLiteral(operator1.value, operator1.type);
+        addLexeme('AN', 'green-text', 'Operand Separator');
+        addLexemeLiteral(operator2.value, operator2.type);
+      }
+      else if(/\s*PRODUKT OF\s+/.test(lines[i])){
+        addLexeme('PRODUKT OF', 'green-text', 'Multiplication Operator');
+
+        // remove whitespaces
+        operators = lines[i].substr(11).trim();
+
+        operators = operators.split(' AN ');
+
+        operator1 = {
+          value: operators[0].trim(),
+          type: checkLiteral(operators[0].trim())
+        };
+
+        operator2 = {
+          value: operators[1].trim(),
+          type: checkLiteral(operators[1].trim())
+        };
+
+        // add lexemes
+        addLexemeLiteral(operator1.value, operator1.type);
+        addLexeme('AN', 'green-text', 'Operand Separator');
+        addLexemeLiteral(operator2.value, operator2.type);
+      }
+      else if(/\s*QUOSHUNT OF\s+/.test(lines[i])){
+        addLexeme('QUOSHUNT OF', 'green-text', 'Division Operator');
+
+        // remove whitespaces
+        operators = lines[i].substr(12).trim();
+
+        operators = operators.split(' AN ');
+
+        operator1 = {
+          value: operators[0].trim(),
+          type: checkLiteral(operators[0].trim())
+        };
+
+        operator2 = {
+          value: operators[1].trim(),
+          type: checkLiteral(operators[1].trim())
+        };
+
+        // add lexemes
+        addLexemeLiteral(operator1.value, operator1.type);
+        addLexeme('AN', 'green-text', 'Operand Separator');
+        addLexemeLiteral(operator2.value, operator2.type);
+      }
+      else if(/\s*MOD OF\s+/.test(lines[i])){
+        addLexeme('MOD OF', 'green-text', 'Modulus Operator');
+
+        // remove whitespaces
+        operators = lines[i].substr(7).trim();
+
+        operators = operators.split(' AN ');
+
+        operator1 = {
+          value: operators[0].trim(),
+          type: checkLiteral(operators[0].trim())
+        };
+
+        operator2 = {
+          value: operators[1].trim(),
+          type: checkLiteral(operators[1].trim())
+        };
+
+        // add lexemes
+        addLexemeLiteral(operator1.value, operator1.type);
+        addLexeme('AN', 'green-text', 'Operand Separator');
+        addLexemeLiteral(operator2.value, operator2.type);
+      }
+      else if(/\s*BIGGR OF\s+/.test(lines[i])){
+        addLexeme('BIGGR OF', 'green-text', 'Max Operator');
+
+        // remove whitespaces
+        operators = lines[i].substr(9).trim();
+
+        operators = operators.split(' AN ');
+
+        operator1 = {
+          value: operators[0].trim(),
+          type: checkLiteral(operators[0].trim())
+        };
+
+        operator2 = {
+          value: operators[1].trim(),
+          type: checkLiteral(operators[1].trim())
+        };
+
+        // add lexemes
+        addLexemeLiteral(operator1.value, operator1.type);
+        addLexeme('AN', 'green-text', 'Operand Separator');
+        addLexemeLiteral(operator2.value, operator2.type);
+      }
+      else if(/\s*SMALLR OF\s+/.test(lines[i])){
+        addLexeme('SMALLR OF', 'green-text', 'Min Operator');
+
+        // remove whitespaces
+        operators = lines[i].substr(10).trim();
+
+        operators = operators.split(' AN ');
+
+        operator1 = {
+          value: operators[0].trim(),
+          type: checkLiteral(operators[0].trim())
+        };
+
+        operator2 = {
+          value: operators[1].trim(),
+          type: checkLiteral(operators[1].trim())
+        };
+
+        // add lexemes
+        addLexemeLiteral(operator1.value, operator1.type);
+        addLexeme('AN', 'green-text', 'Operand Separator');
+        addLexemeLiteral(operator2.value, operator2.type);
+      }
+
     }
 
     // parsing is successful if we manage to get to this code
@@ -269,6 +391,12 @@ angular.module('app', []).controller('AppController', function($scope){
         }
         else{
           // variable
+          // get symbol object
+          var symbol = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', value)];
+
+          typeText = symbol.type.text;
+          value = symbol.value.text;
+          valueColor = symbol.value.color;
         }
 
         // edit symbol
@@ -359,5 +487,59 @@ angular.module('app', []).controller('AppController', function($scope){
     $scope.console.push({
       text: '> ' + text
     });
+  }
+
+  function checkLiteral(value){
+    if(regex.NOOB.test(value)){
+      // NOOB
+      return 'NOOB';
+    }
+    else if(regex.TROOF.test(value)){
+      // TROOF
+      return 'TROOF';
+    }
+    else if(regex.NUMBR.test(value)){
+      // NUMBR
+      return 'NUMBR';
+    }
+    else if(regex.NUMBAR.test(value)){
+      // NUMBAR
+      return 'NUMBAR';
+    }
+    else if(regex.YARN.test(value)){
+      // YARN
+      return 'YARN';
+    }
+    else{
+      // variable
+      return 'variable';
+    }
+  }
+
+  function addLexemeLiteral(value, type){
+    switch(type){
+      case 'NOOB':
+        addLexeme(value, 'yellow-text', 'Null Literal');
+        break;
+      case 'TROOF':
+        addLexeme(value, 'red-text', 'Boolean Literal');
+        break;
+      case 'NUMBR':
+        addLexeme(value, 'white-text', 'Integer Literal');
+        break;
+      case 'NUMBAR':
+        addLexeme(value, 'white-text', 'Float Literal');
+        break;
+      case 'YARN':
+        // omit string delimeters
+        value = value.substring(1, value.length - 1);
+        addLexeme('"', 'blue-text', 'String Delimeter');
+        addLexeme(value, 'blue-text', 'String Literal');
+        addLexeme('"', 'blue-text', 'String Delimeter');
+        break;
+      case 'variable':
+        addLexeme(value, 'white-text', 'Variable Identifier');
+        break;
+    }
   }
 });

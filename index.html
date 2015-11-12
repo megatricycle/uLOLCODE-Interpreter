@@ -5,74 +5,76 @@
     <link rel="stylesheet" href="css/materialize.min.css" media="screen" title="no title" charset="utf-8">
     <link rel="stylesheet" href="css/master.css" media="screen" title="no title" charset="utf-8">
   </head>
-  <body ng-controller="AppController" class="ng-cloak" ng-cloak ng-class="{{show}}">
-    <div class="row">
-      <div class="col s4 upper-part">
-        <h5>Code</h5>
-        <div class="card-panel upper-panel no-padding">
-          <div id="editor"></div>
+  <body ng-controller="AppController">
+    <div class="ng-cloak" ng-cloak ng-class="{{show}}">
+      <div class="row">
+        <div class="col s4 upper-part">
+          <h5>Code</h5>
+          <div class="card-panel upper-panel no-padding">
+            <div id="editor"></div>
+          </div>
         </div>
-      </div>
-      <div class="col s4 upper-part">
-        <h5>Lexemes</h5>
-        <div class="card-panel upper-panel no-padding">
-          <table class="centered bordered">
-            <thead>
-              <tr>
-                  <th>Lexeme</th>
-                  <th>Description</th>
-              </tr>
-            </thead>
+        <div class="col s4 upper-part">
+          <h5>Lexemes</h5>
+          <div class="card-panel upper-panel no-padding">
+            <table class="centered bordered">
+              <thead>
+                <tr>
+                    <th>Lexeme</th>
+                    <th>Description</th>
+                </tr>
+              </thead>
 
-            <tbody>
-              <tr ng-repeat="lexeme in lexemes">
-                <td class="{{lexeme.lexeme.color}}" ng-cloak>{{lexeme.lexeme.text}}</td>
-                <td ng-cloak>{{lexeme.desc}}</td>
-              </tr>
-            </tbody>
-          </table>
+              <tbody>
+                <tr ng-repeat="lexeme in lexemes">
+                  <td class="{{lexeme.lexeme.color}}" ng-cloak>{{lexeme.lexeme.text}}</td>
+                  <td ng-cloak>{{lexeme.desc}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-      <div class="col s4 upper-part">
-        <h5>Symbol table</h5>
-        <div class="card-panel upper-panel no-padding">
-          <table class="centered bordered">
-            <thead>
-              <tr>
-                  <th>Identifier</th>
-                  <th>Type</th>
-                  <th>Value</th>
-              </tr>
-            </thead>
+        <div class="col s4 upper-part">
+          <h5>Symbol table</h5>
+          <div class="card-panel upper-panel no-padding">
+            <table class="centered bordered">
+              <thead>
+                <tr>
+                    <th>Identifier</th>
+                    <th>Type</th>
+                    <th>Value</th>
+                </tr>
+              </thead>
 
-            <tbody>
-              <tr ng-repeat="symbol in symbolTable">
-                <td ng-cloak>{{symbol.identifier}}</td>
-                <td class="{{symbol.type.color}}" ng-cloak>{{symbol.type.text}}</td>
-                <td class="{{symbol.value.color}}" ng-cloak>{{symbol.value.text}}</td>
-              </tr>
-            </tbody>
-          </table>
+              <tbody>
+                <tr ng-repeat="symbol in symbolTable">
+                  <td ng-cloak>{{symbol.identifier}}</td>
+                  <td class="{{symbol.type.color}}" ng-cloak>{{symbol.type.text}}</td>
+                  <td class="{{symbol.value.color}}" ng-cloak>{{symbol.value.text}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="col s12">
-        <a href="#" class="btn btn-half waves-effect waves-light grey darken-4 {{disabled()}}" ng-click="execute();">{{buttonText()}}</a>
+      <div class="row">
+        <div class="col s12">
+          <a href="#" class="btn btn-half waves-effect waves-light grey darken-4 {{disabled()}}" ng-click="execute();">{{buttonText()}}</a>
+        </div>
       </div>
-    </div>
-    <div>
-      <h5>Console</h5>
-      <div class="card-panel console-panel">
-        <div class="console">
-          <ul class="console-list">
-            <li ng-repeat="line in console"><p class="no-margin" ng-cloak>{{line.text}}</p></li>
-            <li>
-              <form ng-submit="input()">
-                > <input id="input" type="text" ng-focus="focusInput()"/>
-              </form>
-            </li>
-          </ul>
+      <div>
+        <h5>Console</h5>
+        <div class="card-panel console-panel">
+          <div class="console">
+            <ul class="console-list">
+              <li ng-repeat="line in console"><p class="no-margin" ng-cloak>{{line.text}}</p></li>
+              <li>
+                <form ng-submit="input()">
+                  > <input id="input" type="text" ng-focus="focusInput()"/>
+                </form>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
