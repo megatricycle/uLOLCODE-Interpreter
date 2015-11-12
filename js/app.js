@@ -1,5 +1,4 @@
 // @TODO:
-// VISIBLE FIX LITERAL COLORS
 // STRING LITERALS DONT RESPECT WHITESPACES
 // SYNTAX ERRORS
 
@@ -106,7 +105,7 @@ angular.module('app', []).controller('AppController', function($scope){
       else if(/^\s*KTHXBYE\s*$/.test(lines[i])){
         addLexeme('KTHXBYE', 'green-text', 'Code Delimeter');
       }
-      else if(/^\s*VISIBLE\s*/.test(lines[i])){
+      else if(/^\s*VISIBLE\s+/.test(lines[i])){
         addLexeme('VISIBLE', 'green-text', 'Output Keyword');
 
         identifier = lines[i].substr(8).trim();
