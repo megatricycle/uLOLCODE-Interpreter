@@ -147,14 +147,77 @@ angular.module('app', []).controller('AppController', function($scope){
           addLexeme(identifier, 'white-text', 'Variable Identifier');
         }
       }
+      else if(/\s*[A-Za-z][A-Za-z0-9_]*\s+R\s+.+\s*$/.test(lines[i])){
+
+        var identifier = lines[i].split(' R ');
+
+        //variable
+        addLexeme(identifier[0], 'white-text', 'Variable Identifier');
+
+        addLexeme('R', 'green-text', 'Assignment Statement');
+
+        //value
+        addLexemeLiteral(identifier[1], checkLiteral(identifier[1]));
+
+      }
       else if(/\s*GIMMEH\s+/.test(lines[i])){
         addLexeme('GIMMEH', 'green-text', 'Input Identifier');
 
-        // remove whitespaces
-        identifier = lines[i].substr(7).trim();
+        // get string to concat
+        identifier = lines[i].substring(lines[i].substr(7).trim());
 
         // add identifier
         addLexeme(identifier, 'white-text', 'Variable Identifier');
+      }
+      //smoosh
+      else if(/\s*SMOOSH\s+/.test(lines[i])){
+        addLexeme('SMOOSH', 'green-text', 'String Concatenation');
+
+        if(/\s*SMOOSH\s+".+"\s+AN\s+".+"\s*/.test(lines[i])){
+          // remove smoosh
+          var identifier = lines[i].substring(lines[i].indexOf('"'));
+          //split
+          identifier = identifier.split("AN");
+
+          identifier[0] = identifier[0].substr(identifier[0].indexOf('"'), identifier[0].length - 1);
+          addLexemeLiteral(identifier[0], 'YARN');
+          addLexeme('AN', 'green-text', 'String Delimiter');
+
+          identifier[1] = identifier[1].substr(identifier[1].indexOf('"'), identifier[1].length - 1);
+          addLexemeLiteral(identifier[1], 'YARN');
+        }
+        else if(/\s*SMOOSH\s+".+"\s+AN\s+\S+\s*/.test(lines[i])){
+            //remove smoosh
+            var identifier = lines[i].substring(lines[i].indexOf('"'));
+
+            identifier = identifier.split("AN");
+
+            identifier[0] = identifier[0].substr(identifier[0].indexOf('"'), identifier[0].length - 1);
+            addLexemeLiteral(identifier[0], 'YARN');
+            addLexeme('AN', 'green-text', 'String Delimiter');
+            addLexeme(identifier[1], 'white-text', 'Variable identifier');
+        }
+        else if(/\s*SMOOSH\s+\S+\s+AN\s+".+"\s*/.test(lines[i])){
+            //remove smoosh
+            var identifier = lines[i].substring(lines[i].indexOf('H') + 1);
+
+            identifier = identifier.split("AN");
+            addLexeme(identifier[0], 'white-text', 'Variable identifier');
+            addLexeme('AN', 'green-text', 'String Delimiter');
+            identifier[1] = identifier[1].substr(identifier[1].indexOf('"'), identifier[1].length - 1);
+            addLexemeLiteral(identifier[1], 'YARN');
+        }
+        else if(/\s*SMOOSH\s+\S+\s+AN\s+\S+\s*/.test(lines[i])){
+            //remove smoosh
+            var identifier = lines[i].substring(lines[i].indexOf('H') + 1);
+
+            identifier = identifier.split("AN");
+
+            addLexeme(identifier[0], 'white-text', 'Variable identifier');
+            addLexeme('AN', 'green-text', 'String Delimiter');
+            addLexeme(identifier[1], 'white-text', 'Variable identifier');
+        }
+
       }
       // arithmetic operations
       else if(/\s*SUM OF\s+/.test(lines[i])){
