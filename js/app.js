@@ -189,7 +189,7 @@ angular.module('app', []).controller('AppController', function($scope){
       }
       else if(/\s*[A-Za-z][A-Za-z0-9_]*\s+R\s+.+\s*$/.test(lines[i])){
 
-        var identifier = lines[i].split(' R ');
+        identifier = lines[i].split(' R ');
 
         //variable
         addLexeme(identifier[0], 'white-text', 'Variable Identifier');
@@ -206,7 +206,7 @@ angular.module('app', []).controller('AppController', function($scope){
 
         if(/\s*SMOOSH\s+".+"\s+AN\s+".+"\s*/.test(lines[i])){
           // remove smoosh
-          var identifier = lines[i].substring(lines[i].indexOf('"'));
+          identifier = lines[i].substring(lines[i].indexOf('"'));
           //split
           identifier = identifier.split("AN");
 
@@ -219,7 +219,7 @@ angular.module('app', []).controller('AppController', function($scope){
         }
         else if(/\s*SMOOSH\s+".+"\s+AN\s+\S+\s*/.test(lines[i])){
             //remove smoosh
-            var identifier = lines[i].substring(lines[i].indexOf('"'));
+            identifier = lines[i].substring(lines[i].indexOf('"'));
 
             identifier = identifier.split("AN");
 
@@ -230,7 +230,7 @@ angular.module('app', []).controller('AppController', function($scope){
         }
         else if(/\s*SMOOSH\s+\S+\s+AN\s+".+"\s*/.test(lines[i])){
             //remove smoosh
-            var identifier = lines[i].substring(lines[i].indexOf('H') + 1);
+            identifier = lines[i].substring(lines[i].indexOf('H') + 1);
 
             identifier = identifier.split("AN");
             addLexeme(identifier[0], 'white-text', 'Variable identifier');
@@ -240,7 +240,7 @@ angular.module('app', []).controller('AppController', function($scope){
         }
         else if(/\s*SMOOSH\s+\S+\s+AN\s+\S+\s*/.test(lines[i])){
             //remove smoosh
-            var identifier = lines[i].substring(lines[i].indexOf('H') + 1);
+            identifier = lines[i].substring(lines[i].indexOf('H') + 1);
 
             identifier = identifier.split("AN");
 
@@ -499,8 +499,8 @@ angular.module('app', []).controller('AppController', function($scope){
         }
       }
 
-      $scope.console.push({text: '> Execution successful.'});
-  }
+      $scope.run(0);
+  };
 
 
   $scope.run = function(i){
