@@ -348,6 +348,8 @@ angular.module('app', []).controller('AppController', function($scope){
         $scope.lexemeIndex++;
         var type = checkLiteral(value);
 
+        console.log(type);
+
        switch(type){
           case 'TROOF':
             if(value == 'WIN') printToConsole('WIN');
@@ -365,9 +367,9 @@ angular.module('app', []).controller('AppController', function($scope){
             break;
           case 'variable':
             symbol = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', value)];
-
             typeText = symbol.type.text;
             value = symbol.value.text;
+
 
             switch(typeText){
               case 'TROOF':
@@ -385,13 +387,11 @@ angular.module('app', []).controller('AppController', function($scope){
             }
 
             break;
-          case 'expression':
-            symbol = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', value)];
+          case 'expressionToken':
+            var expressionValue = evaluateExpression();
+            var expressionType = checkLiteral(expressionValue);
 
-            typeText = symbol.type.text;
-            value = symbol.value.text;
-
-            switch(typeText){
+            switch(expressionType){
               case 'TROOF':
                 if(value == 'WIN') printToConsole('WIN');
                 else printToConsole('FAIL');
@@ -399,15 +399,85 @@ angular.module('app', []).controller('AppController', function($scope){
               case 'NOOB':
               case 'NUMBR':
               case 'NUMBAR':
-                printToConsole(value);
+                printToConsole(expressionValue);
                 break;
               case 'YARN':
-                printToConsole(value.substr(1, value.length - 2));
+                printToConsole(expressionValue.substr(1, value.length - 2));
                 break;
             }
 
             break;
        }
+      }
+      else if($scope.lexemes[i].lexeme.text == 'R'){
+        identifier = $scope.lexemes[i - 1].lexeme.text;
+        value = $scope.lexemes[++i].lexeme.text;
+        $scope.lexemeIndex++;
+
+        var valueColor;
+
+        // identify typeText
+        if(regex.NOOB.test(value)){
+          // NOOB
+          typeText = 'NOOB';
+          valueColor = 'yellow-text';
+        }
+        else if(regex.TROOF.test(value)){
+          // TROOF
+          typeText = 'TROOF';
+          valueColor = 'red-text';
+        }
+        else if(regex.NUMBR.test(value)){
+          // NUMBR
+          typeText = 'NUMBR';
+          valueColor = 'white-text';
+        }
+        else if(regex.NUMBAR.test(value)){
+          // NUMBAR
+          typeText = 'NUMBAR';
+          valueColor = 'white-text';
+        }
+        else if(value == '"'){
+          // YARN
+          typeText = 'YARN';
+          valueColor = 'blue-text';
+
+          value = '"' + $scope.lexemes[++i].lexeme.text + '"';
+          i++;
+          $scope.lexemeIndex += 2;
+        }
+        else if(regex.expressionToken.test(value)){
+          value = evaluateExpression();
+          typeText = checkLiteral(value);
+
+          switch(typeText){
+            case 'NOOB':
+              valueColor = 'yellow-text';
+              break;
+            case 'TROOF':
+              valueColor = 'red-text';
+              break;
+            case 'NUMBR':
+            case 'NUMBAR':
+              valueColor = 'white-text';
+              break;
+            case 'YARN':
+              valueColor = 'blue-text';
+              break;
+          }
+        }
+        else{
+          // variable
+          // get symbol object
+          symbol = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', value)];
+
+          typeText = symbol.type.text;
+          value = symbol.value.text;
+          valueColor = symbol.value.color;
+        }
+
+        // edit symbol
+        editSymbol(identifier, typeText, 'yellow-text', value, valueColor);
       }
     }
 
@@ -537,6 +607,9 @@ angular.module('app', []).controller('AppController', function($scope){
     else if(regex.expression.test(value)){
       return 'expression';
     }
+    else if(regex.expressionToken.test(value)){
+      return 'expressionToken';
+    }
   }
 
   function addLexemeLiteral(value, type){
@@ -608,7 +681,7 @@ angular.module('app', []).controller('AppController', function($scope){
           operator = 'Or Operator';
         }
         else if(regex.WONOF.test(value)){
-          operation = 'BOTH OF';
+          operation = 'WON OF';
           operator = 'Xor Operator';
         }
         else if(regex.NOT.test(value)){
@@ -648,8 +721,10 @@ angular.module('app', []).controller('AppController', function($scope){
         var type2 = operator2.type;
 
         addLexemeLiteral(value1, type1);
-        addLexeme('AN', 'green-text', 'Operand Separator');
-        addLexemeLiteral(value2, type2);
+        if(operator2.value != ''){
+          addLexeme('AN', 'green-text', 'Operand Separator');
+          addLexemeLiteral(value2, type2);
+        }
     }
   }
 
@@ -659,7 +734,7 @@ angular.module('app', []).controller('AppController', function($scope){
     var a = s.split(' ');
 
     for(var i = 0; i < s.length; i++){
-      if(a[i] == 'SUM' || a[i] == 'DIFF' || a[i] == 'PRODUKT' || a[i] == 'QUOSHUNT'){
+      if(a[i] == 'SUM' || a[i] == 'DIFF' || a[i] == 'PRODUKT' || a[i] == 'QUOSHUNT' || a[i] == 'MOD' || a[i] == 'BIGGR' || a[i] == 'SMALLR' || a[i] == 'BOTH' || a[i] == 'EITHER' || a[i] == 'DIFFRINT' || a[i] == 'SMOOSH'){
         a[i] = a[i] + ' ' +a[i + 1];
         a.splice(i + 1, 1);
       }
@@ -696,8 +771,10 @@ angular.module('app', []).controller('AppController', function($scope){
   // @TODO: YARN not working
   function evaluateExpression(){
     do{
-      if(regex.arithmetic.test($scope.operationStack[$scope.operationStack.length - 1]) &&
-         regex.arithmetic.test($scope.operationStack[$scope.operationStack.length - 2])){
+      if(regex.literal.test($scope.operationStack[$scope.operationStack.length - 1]) &&
+         regex.literal.test($scope.operationStack[$scope.operationStack.length - 2])){
+
+        alert($scope.operationStack);
 
         var rightOperand = $scope.operationStack.pop();
         var leftOperand = $scope.operationStack.pop();
@@ -710,12 +787,44 @@ angular.module('app', []).controller('AppController', function($scope){
         else if(regex.NUMBAR.test(rightOperand)){
           rightOperand = parseFloat(rightOperand);
         }
+        else if(regex.TROOF.test(rightOperand)){
+          rightOperand = rightOperand == 'WIN'? true: false;
+        }
+        else if(regex.variable.test(rightOperand)){
+          rightOperand = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', rightOperand)].value.text;
+
+          if(regex.NUMBR.test(rightOperand)){
+            rightOperand = parseInt(rightOperand);
+          }
+          else if(regex.NUMBAR.test(rightOperand)){
+            rightOperand = parseFloat(rightOperand);
+          }
+          else if(regex.TROOF.test(rightOperand)){
+            rightOperand = rightOperand == 'WIN'? true: false;
+          }
+        }
 
         if(regex.NUMBR.test(leftOperand)){
           leftOperand = parseInt(leftOperand);
         }
         else if(regex.NUMBAR.test(leftOperand)){
           leftOperand = parseFloat(leftOperand);
+        }
+        else if(regex.TROOF.test(leftOperand)){
+          leftOperand = leftOperand == 'WIN'? true: false;
+        }
+        else if(regex.variable.test(rightOperand)){
+          leftOperand = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', leftOperand)].value.text;
+
+          if(regex.NUMBR.test(rightOperand)){
+            rightOperand = parseInt(rightOperand);
+          }
+          else if(regex.NUMBAR.test(rightOperand)){
+            rightOperand = parseFloat(rightOperand);
+          }
+          else if(regex.TROOF.test(rightOperand)){
+            rightOperand = rightOperand == 'WIN'? true: false;
+          }
         }
 
         var operatedFlag = false;
@@ -747,6 +856,18 @@ angular.module('app', []).controller('AppController', function($scope){
             break;
           case 'SMALLR OF':
             $scope.operationStack.push((leftOperand <= rightOperand? leftOperand: rightOperand) + '');
+            operatedFlag = true;
+            break;
+          case 'BOTH OF':
+            $scope.operationStack.push((leftOperand && rightOperand? 'WIN': 'FAIL') + '');
+            operatedFlag = true;
+            break;
+          case 'EITHER OF':
+            $scope.operationStack.push((leftOperand || rightOperand? 'WIN': 'FAIL') + '');
+            operatedFlag = true;
+            break;
+          case 'WON OF':
+            $scope.operationStack.push(((leftOperand? !rightOperand: rightOperand)? 'WIN': 'FAIL') + '');
             operatedFlag = true;
             break;
         }

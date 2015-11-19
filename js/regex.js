@@ -5,8 +5,8 @@ module.exports = {
   'NUMBAR': /^-?\d+\.\d+$/,
   'YARN': /^".*"$/,
   'variable': /^[A-Za-z][A-Za-z0-9_]*$/,
-  'expression': /^(SUM OF .+ AN .+|DIFF OF .+ AN .+|PRODUKT OF .+ AN .+|QUOSHUNT OF .+ AN .+|MOD OF .+ AN .+|BIGGR OF .+ AN .+|SMALLR OF .+ AN .+|BOTH OF .+ AN .+|EITHER OF .+ AN .+|WON OF .+ AN .+|NOT +|ALL OF .+ AN .+ MKAY|EITHER OF .+ AN .+ MKAY|BOTH SAEM OF .+ AN .+|DIFFRINT OF .+ AN .+|SMOOSH .+ AN .+)$/,
-  'expressionToken': /^(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF|BOTH OF|EITHER OF|WON OF|NOT +|ALL OF MKAY|EITHER OF MKAY|BOTH SAEM OF|DIFFRINT OF|SMOOSH)$/,
+  'expression': /^(SUM OF .+ AN .+|DIFF OF .+ AN .+|PRODUKT OF .+ AN .+|QUOSHUNT OF .+ AN .+|MOD OF .+ AN .+|BIGGR OF .+ AN .+|SMALLR OF .+ AN .+|BOTH OF .+ AN .+|EITHER OF .+ AN .+|WON OF .+ AN .+|NOT .+|ALL OF .+ AN .+ MKAY|EITHER OF .+ AN .+ MKAY|BOTH SAEM OF .+ AN .+|DIFFRINT OF .+ AN .+|SMOOSH .+ AN .+)$/,
+  'expressionToken': /^(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF|BOTH OF|EITHER OF|WON OF|NOT|ALL OF .+ MKAY|EITHER OF .+ MKAY|BOTH SAEM OF|DIFFRINT OF|SMOOSH)$/,
   'HAI': /^\s*HAI\s*$/,
   'KTHXBYE': /^\s*KTHXBYE\s*$/,
   'VISIBLE': /^\s*VISIBLE\s+/,
@@ -24,6 +24,10 @@ module.exports = {
   'MODOF': /^\s*MOD OF\s+/,
   'BIGGROF': /^\s*BIGGR OF\s+/,
   'SMALLROF': /^\s*SMALLR OF\s+/,
+  'BOTHOF': /^\s*BOTH OF\s+/,
+  'EITHEROF': /^\s*EITHER OF\s+/,
+  'WONOF': /^\s*WON OF\s+/,
+  'NOT':/^\s*NOT\s+/,
   'TLDR': /^\s*TLDR\s*$/,
-  'arithmetic': /^(-?\d+|-?\d+\.\d+|".*")$/
+  'literal': /^(-?\d+|-?\d+\.\d+|".*"|WIN|FAIL|[A-Za-z][A-Za-z0-9_]*)$/ // @TODO: warning: will catch NOT expression
 };
