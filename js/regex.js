@@ -24,5 +24,6 @@ module.exports = {
   'MODOF': /^\s*MOD OF\s+/,
   'BIGGROF': /^\s*BIGGR OF\s+/,
   'SMALLROF': /^\s*SMALLR OF\s+/,
-  'TLDR': /^\s*TLDR\s*$/
+  'TLDR': /^\s*TLDR\s*$/,
+  'arithmetic': /^(-?\d+|-?\d+\.\d+|".*")$/
 };
