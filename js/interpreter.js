@@ -745,7 +745,7 @@ angular.module('app', []).controller('AppController', function($scope){
       case 'expression':
         var operator;
         var operation;
-      default:
+      case 'invalid':
         value = value.substring(1, value.length - 1);
         addLexeme(value, 'red-text', 'Invalid keyword');
         break;
