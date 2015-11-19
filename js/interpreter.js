@@ -84,9 +84,22 @@ angular.module('app', []).controller('AppController', function($scope){
         addLexeme('VISIBLE', 'green-text', 'Output Keyword');
 
         identifier = lines[i].substr(8).trim();
-        type = checkLiteral(identifier);
 
-        addLexemeLiteral(identifier, type);
+            //VISIBLE + SMOOSH
+            if(regex.SMOOSH.test(identifier)){
+                printToConsole("Perform: "+identifier);
+                addLexeme('SMOOSH', 'green-text', 'String Concatenation');
+                identifier = identifier.substring(6);
+                identifier = identifier.split('AN');
+                addLexemeLiteral(identifier[0].trim(), 'YARN');
+                addLexeme('AN', 'green-text', 'Operand Separator');
+                addLexemeLiteral(identifier[1].trim(), 'YARN');
+            }
+            else{
+              type = checkLiteral(identifier);
+              addLexemeLiteral(identifier, type);
+            }
+
       }
       else if(regex.IHASA.test(lines[i])){
         addLexeme('I HAS A', 'green-text', 'Variable Declaration');
@@ -159,6 +172,33 @@ angular.module('app', []).controller('AppController', function($scope){
       // operations
       else if(regex.expression.test(lines[i])){
         addLexemeLiteral(lines[i], 'expression');
+      }
+      else if(regex.WTF.test(lines[i])){
+        addLexeme('WTF?', 'green-text', 'Start of Switch Case');
+      }
+      else if(regex.OIC.test(lines[i])){
+        addLexeme('OIC', 'green-text', 'End of Switch Case/If-Then');
+      }
+      else if(regex.ORLY.test(lines[i])){
+        addLexeme('O RLY?', 'green-text', 'Start of If-Then');
+      }
+      else if(regex.YARLY.test(lines[i])){
+        addLexeme('YA RLY', 'green-text', 'If Clause');
+      }
+      else if(regex.NOWAI.test(lines[i])){
+        addLexeme('NO WAI', 'green-text', 'Else Clause');
+      }
+      else if(regex.GTFO.test(lines[i])){
+        addLexeme('GTFO', 'green-text', 'Break');
+      }
+      else if(regex.OMG.test(lines[i])){
+        addLexeme('OMG', 'green-text','Case');
+        var literal = lines[i].trim();
+        literal = lines[i].substring(lines[i].indexOf('G') + 2, lines[i].length);
+        addLexemeLiteral(literal, 'YARN');
+      }
+      else if(regex.OMGWTF.test(lines[i])){
+        addLexeme('OMGWTF', 'green-text', 'Default Case');
       }
       else if(regex.TLDR.test(lines[i])){}
       else{
