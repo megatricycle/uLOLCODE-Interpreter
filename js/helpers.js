@@ -34,3 +34,13 @@ String.prototype.truncate = function(x){
   if(this.length < x) return this.valueOf();
   else return this.substring(0, x - 3) + "...";
 };
+
+String.prototype.splitFirst = function(x){
+  // get index of first Delimeter
+  var index = this.indexOf(x);
+
+  return [
+    this.substring(0, index),
+    this.substring(index + x.length)
+  ]
+}
