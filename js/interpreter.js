@@ -123,6 +123,7 @@ angular.module('app', []).controller('AppController', function($scope){
         }
       }
       else if(regex.GIMMEH.test(lines[i])){
+
         addLexeme('GIMMEH', 'green-text', 'Input Identifier');
 
         // get string to concat
@@ -192,49 +193,52 @@ angular.module('app', []).controller('AppController', function($scope){
 
         if($scope.lexemes[i].lexeme.text == "I HAS A"){
           identifier = $scope.lexemes[++i].lexeme.text;
-
           if(!(regex.variable.test(identifier))){
-            $scope.console.push({text: '> SYNTAX ERROR: Invalid variable on line ' });
+            $scope.console.push({text: '> SYNTAX ERROR: Invalid variable' });
             return;
           }
         }
 
         else if($scope.lexemes[i].lexeme.text == "GIMMEH"){
           identifier = $scope.lexemes[++i].lexeme.text;
-
           if(!(regex.variable.test(identifier))){
-            $scope.console.push({text: '> SYNTAX ERROR: Invalid variable on line '});
+            $scope.console.push({text: '> SYNTAX ERROR: Invalid variable'});
             return;
           }
-          /*else if($scope.symbolTable.indexOfAttr('identifier', identifier) == -1){
-            //check if the variable is present in the lexemes
-            printToConsole('> SYNTAX ERROR: Variable does not exist.')
-            return;
-          }*/
         }
 
         else if($scope.lexemes[i].lexeme.text == "ITZ"){
-            // checks if value is string, number, numbar
+          identifier = $scope.lexemes[++i].lexeme.text;
+          if(!(checkLiteral(identifier))){ //how to check if it is a literal or not
+            printToConsole('SYNTAX ERROR: Invalid identifier.')
+          }
         }
 
         else if($scope.lexemes[i].lexeme.text == "R"){
-            // checks if value is string, number, numbar
+          identifier = $scope.lexemes[++i].lexeme.text;
+          if((checkLiteral(identifier))){
+            printToConsole('SYNTAX ERROR: Invalid identifier.')
+          }
         }
 
         else if($scope.lexemes[i].lexeme.text == "AN"){
             // checks if value is string, number, numbar
         }
 
+        else if($scope.lexemes[i].lexeme.text == "BTW"){
+            // ignores the entire line of comments
+        }
+
         else if($scope.lexemes[i].lexeme.text == "OBTW"){
-            // checks if value is string, number, numbar
+            // ignores lines before TLDR because used for multi line comments
         }
 
         else if($scope.lexemes[i].lexeme.text == "TLDR"){
-            // checks if value is string, number, numbar
+            // closing for multi lines of code
         }
         else if($scope.lexemes[i].desc == "Unknown Keyword"){
             // checks if value is string, number, numbar
-            printToConsole('SYNTAX ERROR: Unknown keyword on line ' + i);
+            printToConsole('SYNTAX ERROR: Unknown keyword');
             return;
         }
       }
@@ -257,20 +261,35 @@ angular.module('app', []).controller('AppController', function($scope){
         addSymbol(identifier, 'NOOB', 'yellow-text', 'NOOB', 'yellow-text');
       }
       else if($scope.lexemes[i].lexeme.text == "GIMMEH"){
+
         identifier = $scope.lexemes[++i].lexeme.text;
         $scope.lexemeIndex++;
+        var type = checkLiteral(identifier);
 
-        // wait for input
-        $('#input').focus();
+        if(type == "variable"){
+          symbol = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', identifier)];
 
-        // set state to waiting for input
-        $scope.state = "input";
+          if(!symbol){
+            printToConsole("SYNTAX ERROR: Variable does not exist.");
+            return;
+          }
+          else{
+            // wait for input
+            $('#input').focus();
 
-        // set identifier
-        $scope.identifier = identifier;
+            // set state to waiting for input
+            $scope.state = "input";
 
-        // break run
-        return;
+            // set identifier
+            $scope.identifier = identifier;
+
+            // break run
+            return;
+          }
+        }
+        else{
+            printToConsole('SYNTAX ERROR: Invalid variable!')
+        }
       }
       else if($scope.lexemes[i].lexeme.text == 'ITZ'){
         // get identifier and value
@@ -366,10 +385,17 @@ angular.module('app', []).controller('AppController', function($scope){
             $scope.lexemeIndex += 2;
             break;
           case 'variable':
-            symbol = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', value)];
-            typeText = symbol.type.text;
-            value = symbol.value.text;
 
+            symbol = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', value)];
+
+            if(!symbol){
+              printToConsole("SYNTAX ERROR: Variable does not exist.");
+              return;
+            }
+            else{
+              typeText = symbol.type.text;
+              value = symbol.value.text;
+            }
 
             switch(typeText){
               case 'TROOF':
