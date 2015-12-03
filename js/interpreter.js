@@ -1,13 +1,9 @@
 // @TODO:
-// operation
-// infinity
 // keyword reserved
-// orly dapat may value yung IT
-// orly dapat may ya rly agad, no wai
-// WTF, okay lang na omgwtf
-// smoosh, infinity
-// comparisons
 // string typecast to int
+// nested operator on infinite operator
+// if else
+// switch
 
 // angular part
 angular.module('app', []).controller('AppController', function($scope){
@@ -385,6 +381,26 @@ angular.module('app', []).controller('AppController', function($scope){
             printToConsole($scope.lexemes[++$scope.lexemeIndex].lexeme.text);
             $scope.lexemeIndex++;
             break;
+          case 'expressionToken':
+            var expressionValue = evaluateExpression();
+            var expressionType = checkLiteral(expressionValue);
+
+            switch(expressionType){
+              case 'TROOF':
+                if(value == 'WIN') printToConsole('WIN');
+                else printToConsole('FAIL');
+                break;
+              case 'NOOB':
+              case 'NUMBR':
+              case 'NUMBAR':
+                printToConsole(expressionValue);
+                break;
+              case 'YARN':
+                printToConsole(expressionValue.substr(1, expressionValue.length - 2));
+                break;
+            }
+
+            break;
           case 'variable':
             symbol = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', value)];
 
@@ -409,26 +425,6 @@ angular.module('app', []).controller('AppController', function($scope){
                 break;
               case 'YARN':
                 printToConsole(value.substr(1, value.length - 2));
-                break;
-            }
-
-            break;
-          case 'expressionToken':
-            var expressionValue = evaluateExpression();
-            var expressionType = checkLiteral(expressionValue);
-
-            switch(expressionType){
-              case 'TROOF':
-                if(value == 'WIN') printToConsole('WIN');
-                else printToConsole('FAIL');
-                break;
-              case 'NOOB':
-              case 'NUMBR':
-              case 'NUMBAR':
-                printToConsole(expressionValue);
-                break;
-              case 'YARN':
-                printToConsole(expressionValue.substr(1, value.length - 2));
                 break;
             }
 
@@ -630,15 +626,15 @@ angular.module('app', []).controller('AppController', function($scope){
       // YARN
       return 'YARN';
     }
-    else if(regex.variable.test(value)){
-      // variable
-      return 'variable';
-    }
     else if(regex.expression.test(value)){
       return 'expression';
     }
     else if(regex.expressionToken.test(value)){
       return 'expressionToken';
+    }
+    else if(regex.variable.test(value)){
+      // variable
+      return 'variable';
     }
   }
 
@@ -676,8 +672,6 @@ angular.module('app', []).controller('AppController', function($scope){
         // 'expressionToken': /^(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF|BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM OF|DIFFRINT OF|SMOOSH)$/,
         var operator;
         var operation;
-
-        console.log('> ' + value);
 
         if(value == 'SUM OF'){
           operation = 'SUM OF';
@@ -844,6 +838,10 @@ angular.module('app', []).controller('AppController', function($scope){
             operation = 'ANY OF';
             operator = 'Infinite Arity Or';
           }
+          else if(regex.SMOOSH.test(value)){
+            operation = 'SMOOSH';
+            operator = 'String Concatenation';
+          }
 
           addLexeme(operation, 'green-text', operator);
 
@@ -852,10 +850,7 @@ angular.module('app', []).controller('AppController', function($scope){
           operands.forEach(function(operand){
             var type = checkLiteral(operand);
 
-            // @TODO: runtime for infinite arity`
-
             addLexemeLiteral(operand, type);
-            console.log(operand + ', ' + type);
           });
         }
     }
@@ -864,7 +859,15 @@ angular.module('app', []).controller('AppController', function($scope){
   function splitANInfinite(string){
     var s = string;
 
-    var a = s.split(' ');
+    var a = s.splitANArguments();
+
+    // consider spaces
+    for(var i = 0; i < a.length; i++){
+      if(a[i] == '"' && a[i + 1] == '"'){
+        a[i] = '" "';
+        a.splice(i + 1, 1);
+      }
+    }
 
     for(var i = 0; i < a.length; i++){
       if(a[i] == 'SUM' || a[i] == 'DIFF' || a[i] == 'PRODUKT' || a[i] == 'QUOSHUNT' || a[i] == 'MOD' || a[i] == 'BIGGR' || a[i] == 'SMALLR' || a[i] == 'BOTH' || a[i] == 'EITHER' || a[i] == 'WON' || a[i] == 'DIFFRINT'){
@@ -879,7 +882,7 @@ angular.module('app', []).controller('AppController', function($scope){
   function splitAN(string){
     var s = string;
 
-    var a = s.split(' ');
+    var a = s.splitANArguments();
 
     for(var i = 0; i < a.length; i++){
       if(a[i] == 'SUM' || a[i] == 'DIFF' || a[i] == 'PRODUKT' || a[i] == 'QUOSHUNT' || a[i] == 'MOD' || a[i] == 'BIGGR' || a[i] == 'SMALLR' || a[i] == 'BOTH' || a[i] == 'EITHER' || a[i] == 'WON' || a[i] == 'DIFFRINT'){
@@ -930,12 +933,7 @@ angular.module('app', []).controller('AppController', function($scope){
 
             var operatedFlag = false;
 
-            switch(operator){
-              case 'NOT':
-                $scope.operationStack.push((operand? 'FAIL': 'WIN') + '');
-                operatedFlag = true;
-                break;
-            }
+            operatedFlag = evaluateOperation(operator, operand);
 
             if($scope.operationStack.length == 1){
               var ret = $scope.operationStack[0];
@@ -973,48 +971,7 @@ angular.module('app', []).controller('AppController', function($scope){
 
           var operatedFlag = false;
 
-          switch(operator){
-            case 'SUM OF':
-              $scope.operationStack.push((leftOperand + rightOperand) + '');
-              operatedFlag = true;
-              break;
-            case 'DIFF OF':
-              $scope.operationStack.push((leftOperand - rightOperand) + '');
-              operatedFlag = true;
-              break;
-            case 'PRODUKT OF':
-              $scope.operationStack.push((leftOperand * rightOperand) + '');
-              operatedFlag = true;
-              break;
-            case 'QUOSHUNT OF':
-              $scope.operationStack.push((leftOperand / rightOperand) + '');
-              operatedFlag = true;
-              break;
-            case 'MOD OF':
-              $scope.operationStack.push((leftOperand % rightOperand) + '');
-              operatedFlag = true;
-              break;
-            case 'BIGGR OF':
-              $scope.operationStack.push((leftOperand >= rightOperand? leftOperand: rightOperand) + '');
-              operatedFlag = true;
-              break;
-            case 'SMALLR OF':
-              $scope.operationStack.push((leftOperand <= rightOperand? leftOperand: rightOperand) + '');
-              operatedFlag = true;
-              break;
-            case 'BOTH OF':
-              $scope.operationStack.push((leftOperand && rightOperand? 'WIN': 'FAIL') + '');
-              operatedFlag = true;
-              break;
-            case 'EITHER OF':
-              $scope.operationStack.push((leftOperand || rightOperand? 'WIN': 'FAIL') + '');
-              operatedFlag = true;
-              break;
-            case 'WON OF':
-              $scope.operationStack.push(((leftOperand? !rightOperand: rightOperand)? 'WIN': 'FAIL') + '');
-              operatedFlag = true;
-              break;
-          }
+          operatedFlag = evaluateOperation(operator, leftOperand, rightOperand);
 
           if($scope.operationStack.length == 1){
             var ret = $scope.operationStack[0];
@@ -1034,17 +991,121 @@ angular.module('app', []).controller('AppController', function($scope){
         $scope.lexemeIndex++;
       } while($scope.operationStack.length > 0)
     }
-    else if(regex.infinity.test(currentLexeme())){
+    else if(currentLexeme() == 'SMOOSH'){
+      $scope.lexemeIndex++;
 
+      var ret = '';
+
+      // concatenate
+      while(true){
+        if(currentLexeme() == '"'){
+          ret += nextLexeme();
+          $scope.lexemeIndex += 2;
+        }
+        else if(regex.literal.test(currentLexeme())){
+          ret += parseLiteral(currentLexeme(), 'lol');
+        }
+
+        if(nextLexeme() != 'AN'){
+          break;
+        }
+        else{
+          $scope.lexemeIndex++;
+        }
+
+        $scope.lexemeIndex++;
+      }
+
+      return '"' + ret + '"';
+    }
+    else if(regex.infinity.test(currentLexeme())){
+      // check what kind of operator
+      var operator;
+      if(currentLexeme() == 'ALL OF') operator = 'ALL OF';
+      else if(currentLexeme() == 'ANY OF') operator = 'ANY OF';
+
+      // push values
+      var infiniteStack = [];
+
+      $scope.lexemeIndex++;
+      while(currentLexeme() != 'MKAY'){
+        if(currentLexeme() != 'AN'){
+          if(regex.expressionToken.test(currentLexeme())){
+            infiniteStack.push(evaluateExpression());
+          }
+          else{
+            infiniteStack.push(currentLexeme());
+          }
+        }
+        $scope.lexemeIndex++;
+      }
+
+      // evaluate the whole stack with the operator]
+      var ret;
+      if(operator == 'ALL OF'){
+        if(infiniteStack.indexOf('FAIL') == -1) ret = 'WIN';
+        else ret = 'FAIL';
+      }
+      else if(operator == 'ANY OF'){
+        if(infiniteStack.indexOf('WIN') == -1) ret = 'FAIL';
+        else ret = 'WIN';
+      }
+
+      // return
+      $scope.lexemeIndex--;
+      return ret;
+    }
+  }
+
+  function evaluateOperation(operator, firstOperand, secondOperand){
+    switch(operator){
+      case 'NOT':
+        $scope.operationStack.push((firstOperand? 'FAIL': 'WIN') + '');
+        return true;
+      case 'SUM OF':
+        $scope.operationStack.push((firstOperand + secondOperand) + '');
+        return true;
+      case 'DIFF OF':
+        $scope.operationStack.push((firstOperand - secondOperand) + '');
+        return true;
+      case 'PRODUKT OF':
+        $scope.operationStack.push((firstOperand * secondOperand) + '');
+        return true;
+      case 'QUOSHUNT OF':
+        $scope.operationStack.push((firstOperand / secondOperand) + '');
+        return true;
+      case 'MOD OF':
+        $scope.operationStack.push((firstOperand % secondOperand) + '');
+        return true;
+      case 'BIGGR OF':
+        $scope.operationStack.push((firstOperand >= secondOperand? firstOperand: secondOperand) + '');
+        return true;
+      case 'SMALLR OF':
+        $scope.operationStack.push((firstOperand <= secondOperand? firstOperand: secondOperand) + '');
+        return true;
+      case 'BOTH OF':
+        $scope.operationStack.push((firstOperand && secondOperand? 'WIN': 'FAIL') + '');
+        return true;
+      case 'EITHER OF':
+        $scope.operationStack.push((firstOperand || secondOperand? 'WIN': 'FAIL') + '');
+        return true;
+      case 'WON OF':
+        $scope.operationStack.push(((firstOperand? !secondOperand: secondOperand)? 'WIN': 'FAIL') + '');
+        return true;
+      default:
+        return false;
     }
   }
 
   function currentLexeme(){
-    return $scope.lexemes[$scope.lexemeIndex].l
-    exeme.text;
+    return $scope.lexemes[$scope.lexemeIndex].lexeme.text;
   }
 
-  function parseLiteral(x){
+  function nextLexeme(){
+    return $scope.lexemes[$scope.lexemeIndex + 1].lexeme.text;
+  }
+
+  function parseLiteral(x, option){
     if(regex.NUMBR.test(x)){
       return parseInt(x);
     }
@@ -1052,7 +1113,15 @@ angular.module('app', []).controller('AppController', function($scope){
       return parseFloat(x);
     }
     else if(regex.TROOF.test(x)){
-      return x == 'WIN'? true: false;
+      if(option == 'lol'){
+        return x == 'WIN'? 'WIN': 'FAIL';
+      }
+      else{
+        return x == 'WIN'? true: false;
+      }
+    }
+    else if(regex.YARN.test(x)){
+      return x.substring(1, x.length - 1);
     }
     else if(regex.variable.test(x)){
       x = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', x)].value.text;

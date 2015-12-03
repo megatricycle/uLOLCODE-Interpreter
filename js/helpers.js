@@ -55,3 +55,29 @@ String.prototype.numberOf = function(str){
 
   return c;
 };
+
+String.prototype.splitANArguments = function(){
+  var r = [];
+  var t = '';
+  var isQuote = false;
+
+  for(var i = 0; i < this.length; i++){
+    if(!isQuote && this.charAt(i) == ' '){
+      r.push(t);
+      t = '';
+    }
+    else{
+      if(this.charAt(i) == '"'){
+        t += this.charAt(i);
+        isQuote = !isQuote;
+      }
+      else{
+        t += this.charAt(i);
+      }
+    }
+  }
+
+  r.push(t);
+
+  return r;
+}
