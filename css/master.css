@@ -119,6 +119,10 @@ th, td {
   color: #324045;
 }
 
+.purple-text {
+  color: #9774c4;
+}
+
 .ng-cloak {
   display: none !important;
 }

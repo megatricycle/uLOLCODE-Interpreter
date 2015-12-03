@@ -43,4 +43,15 @@ String.prototype.splitFirst = function(x){
     this.substring(0, index),
     this.substring(index + x.length)
   ]
-}
+};
+
+String.prototype.numberOf = function(str){
+  var a = this.split(' ');
+
+  var c = 0;
+
+  for(var i = 0; i < a.length; i++)
+    if(a[i] == str) c++;
+
+  return c;
+};

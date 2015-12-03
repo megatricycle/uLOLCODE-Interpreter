@@ -5,8 +5,11 @@ module.exports = {
   'NUMBAR': /^-?\d+\.\d+$/,
   'YARN': /^".*"$/,
   'variable': /^[A-Za-z][A-Za-z0-9_]*$/,
-  'expression': /^(SUM OF .+ AN .+|DIFF OF .+ AN .+|PRODUKT OF .+ AN .+|QUOSHUNT OF .+ AN .+|MOD OF .+ AN .+|BIGGR OF .+ AN .+|SMALLR OF .+ AN .+|BOTH OF .+ AN .+|EITHER OF .+ AN .+|WON OF .+ AN .+|NOT .+|ALL OF .+ AN .+ MKAY|EITHER OF .+ AN .+ MKAY|BOTH SAEM OF .+ AN .+|DIFFRINT OF .+ AN .+|SMOOSH .+ AN .+)$/,
-  'expressionToken': /^(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF|BOTH OF|EITHER OF|WON OF|NOT|ALL OF .+ MKAY|EITHER OF .+ MKAY|BOTH SAEM OF|DIFFRINT OF|SMOOSH)$/,
+  'expression': /^(SUM OF .+ AN .+|DIFF OF .+ AN .+|PRODUKT OF .+ AN .+|QUOSHUNT OF .+ AN .+|MOD OF .+ AN .+|BIGGR OF .+ AN .+|SMALLR OF .+ AN .+|BOTH OF .+ AN .+|EITHER OF .+ AN .+|WON OF .+ AN .+|NOT .+|ALL OF .+ AN .+ MKAY|EITHER OF .+ AN .+ MKAY|BOTH SAEM OF .+ AN .+|DIFFRINT OF .+ AN .+|ALL OF .+|ANY OF .+)$/,
+  'expressionToken': /^(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF|BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM OF|DIFFRINT OF|SMOOSH)$/,
+  'unary': /^NOT/,
+  'binary': /^(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF|BOTH OF|EITHER OF|WON OF)/,
+  'infinity': /^(ALL OF|ANY OF|SMOOSH)/,
   'HAI': /^\s*HAI\s*$/,
   'KTHXBYE': /^\s*KTHXBYE\s*$/,
   'VISIBLE': /^\s*VISIBLE\s+/,
@@ -27,7 +30,9 @@ module.exports = {
   'BOTHOF': /^\s*BOTH OF\s+/,
   'EITHEROF': /^\s*EITHER OF\s+/,
   'WONOF': /^\s*WON OF\s+/,
-  'NOT':/^\s*NOT\s+/,
-  'TLDR': /^\s*TLDR\s*$/,
-  'literal': /^(-?\d+|-?\d+\.\d+|".*"|WIN|FAIL|[A-Za-z][A-Za-z0-9_]*)$/ // @TODO: warning: will catch NOT expression
+  'NOT': /^\s*NOT\s+/,
+  'ALLOF': /^\s*ALL OF\s+/,
+  'ANYOF': /^\s*ANY OF\s+/,
+  'SMOOSH': /^\s*SMOOSH\s+/,
+  'TLDR': /^\s*TLDR\s*$/
 };
