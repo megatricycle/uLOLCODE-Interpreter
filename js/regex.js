@@ -42,4 +42,13 @@ module.exports = {
   'NOWAI' : /^\s*NO WAI\s*$/,
   'OIC' : /^\s*OIC\s*$/,
   'reserved' : /^(HAI|KTHXBYE|NOT|ITZ|GIMMEH|NOOB|TROOF|NUMBR|NUMBAR|YARN|VISIBLE|R|SMOOSH|BTW|OBTW|NOT|TLDR|OIC|BUKKIT)*$/,
+  'WTF': /^\s*WTF\?\s*$/,
+  'OIC': /^\s*OIC\s*$/,
+  'ORLY': /^\s*O RLY\?\s*$/,
+  'YARLY': /^\s*YARLY\s*$/,
+  'NOWAI': /^\s*NO WAI\s*$/,
+  'GTFO': /^\s*GTFO\s*$/,
+  'OMGWTF': /^\s*OMGWTF\s*$/,
+  'OMG': /^\s*OMG\s+".+"\s*$/,
+  'literal': /^(-?\d+|-?\d+\.\d+|".*"|WIN|FAIL|[A-Za-z][A-Za-z0-9_]*)$/ // @TODO: warning: will catch NOT expression
 };

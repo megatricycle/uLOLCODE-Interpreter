@@ -91,9 +91,22 @@ angular.module('app', []).controller('AppController', function($scope){
         addLexeme('VISIBLE', 'green-text', 'Output Keyword');
 
         identifier = lines[i].substr(8).trim();
-        type = checkLiteral(identifier);
 
-        addLexemeLiteral(identifier, type);
+            //VISIBLE + SMOOSH
+            if(regex.SMOOSH.test(identifier)){
+                printToConsole("Perform: "+identifier);
+                addLexeme('SMOOSH', 'green-text', 'String Concatenation');
+                identifier = identifier.substring(6);
+                identifier = identifier.split('AN');
+                addLexemeLiteral(identifier[0].trim(), 'YARN');
+                addLexeme('AN', 'green-text', 'Operand Separator');
+                addLexemeLiteral(identifier[1].trim(), 'YARN');
+            }
+            else{
+              type = checkLiteral(identifier);
+              addLexemeLiteral(identifier, type);
+            }
+
       }
       else if(regex.IHASA.test(lines[i])){
         addLexeme('I HAS A', 'green-text', 'Variable Declaration');
@@ -167,18 +180,6 @@ angular.module('app', []).controller('AppController', function($scope){
       else if(regex.expression.test(lines[i])){
         addLexemeLiteral(lines[i], 'expression');
       }
-      else if(regex.ORLY.test(lines[i])){
-        addLexeme('O RLY?', 'green-text', 'If-Then Keyword');
-      }
-      else if(regex.YARLY.test(lines[i])){
-        addLexeme('YA RLY', 'green-text', 'If-Then Keyword');
-      }
-      else if(regex.NOWAI.test(lines[i])){
-        addLexeme('NO WAI', 'green-text', 'If-Then Keyword');
-      }
-      else if(regex.OIC.test(lines[i])){
-        addLexeme('OIC', 'green-text', 'If-Then Keyword');
-      }
       else if(regex.TLDR.test(lines[i])){}
       else if(lines[i] == ''){}
       else{
@@ -214,7 +215,7 @@ angular.module('app', []).controller('AppController', function($scope){
         if($scope.lexemes[i].lexeme.text == "I HAS A"){
           identifier = $scope.lexemes[++i].lexeme.text;
           if(!(regex.variable.test(identifier))){
-            $scope.console.push({text: '> SYNTAX ERROR: Invalid variable' });
+            $scope.console.push({text: '> SYNTAX ERROR: Invalid variable next to "I HAS A" expression' });
             return;
           }
           if(regex.reserved.test(identifier)){
@@ -226,7 +227,7 @@ angular.module('app', []).controller('AppController', function($scope){
         else if($scope.lexemes[i].lexeme.text == "GIMMEH"){
           identifier = $scope.lexemes[++i].lexeme.text;
           if(!(regex.variable.test(identifier))){
-            $scope.console.push({text: '> SYNTAX ERROR: Invalid variable'});
+            $scope.console.push({text: '> SYNTAX ERROR: Invalid variable next to "GIMMEH expression"'});
             return;
           }
           if(regex.reserved.test(identifier)){
@@ -236,18 +237,45 @@ angular.module('app', []).controller('AppController', function($scope){
         }
         else if($scope.lexemes[i].lexeme.text == "ITZ"){
           identifier = $scope.lexemes[++i].lexeme.text;
-          if(!(checkLiteral(identifier))){ //how to check if it is a literal or not
-            printToConsole('SYNTAX ERROR: Invalid identifier.')
+          var type = checkLiteral(identifier);
+
+          if(type == "invalid"){
+            printToConsole('SYNTAX ERROR: Invalid type next to "ITZ" expression');
+            return;
           }
         }
         else if($scope.lexemes[i].lexeme.text == "R"){
           identifier = $scope.lexemes[++i].lexeme.text;
-          if((checkLiteral(identifier))){
-            printToConsole('SYNTAX ERROR: Invalid identifier.')
+          var type = checkLiteral(identifier);
+
+          if(type == "invalid"){
+            printToConsole('SYNTAX ERROR: Invalid type next to "R" expression');
+            return;
           }
+
         }
 
         else if($scope.lexemes[i].lexeme.text == "AN"){
+            // checks if value is string, number, numbar
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "YA RLY"){
+            // checks if value is string, number, numbar
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "NO WAI"){
+            // checks if value is string, number, numbar
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "OMG"){
+            // checks if value is string, number, numbar
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "OMGWTF"){
+            // checks if value is string, number, numbar
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "GTFO"){
             // checks if value is string, number, numbar
         }
 
@@ -457,6 +485,18 @@ angular.module('app', []).controller('AppController', function($scope){
 
         var valueColor;
 
+        //syntax checking
+        var type = checkLiteral(identifier);
+
+        if(type == "variable"){
+          symbol = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', identifier)];
+        }
+
+        if(!symbol){
+          printToConsole("SYNTAX ERROR: Variable does not exist.");
+          return;
+        }
+
         // identify typeText
         if(regex.NOOB.test(value)){
           // NOOB
@@ -656,6 +696,7 @@ angular.module('app', []).controller('AppController', function($scope){
     else if(regex.expressionToken.test(value)){
       return 'expressionToken';
     }
+    else return 'invalid';
   }
 
   function addLexemeLiteral(value, type){
@@ -692,6 +733,10 @@ angular.module('app', []).controller('AppController', function($scope){
         // 'expressionToken': /^(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF|BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM OF|DIFFRINT OF|SMOOSH)$/,
         var operator;
         var operation;
+      case 'invalid':
+        value = value.substring(1, value.length - 1);
+        addLexeme(value, 'red-text', 'Invalid keyword');
+        break;
 
         if(value == 'SUM OF'){
           operation = 'SUM OF';
