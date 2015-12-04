@@ -1,9 +1,15 @@
 // @TODO:
 // keyword reserved
-// string typecast to int
+// string typecast to other data types
 // nested operator on infinite operator
-// if else
 // switch
+
+// may it variable
+// may selection stack, true
+// at wtf, push it value to selection stack and executedFlag
+// at case, skip when it != top of selection stack
+// at OMGWTF, skip when top of selection stack has executedFLag
+// at oic, pop selection stack
 
 // angular part
 angular.module('app', []).controller('AppController', function($scope){
@@ -14,6 +20,8 @@ angular.module('app', []).controller('AppController', function($scope){
   $scope.state = "idle";
   $scope.identifier = null;
   $scope.operationStack = [];
+  $scope.it = null;
+  $scope.selectionStack = [];
   $scope.buttonText = function(){
     if($scope.state == "input") return "RUNNING";
     return "EXECUTE";
@@ -165,7 +173,39 @@ angular.module('app', []).controller('AppController', function($scope){
       else if(regex.expression.test(lines[i])){
         addLexemeLiteral(lines[i], 'expression');
       }
+      else if(regex.ORLY.test(lines[i])){
+        addLexeme('ORLY?', 'white-text', 'If-then Statement');
+      }
+      else if(regex.YARLY.test(lines[i])){
+        addLexeme('YA RLY', 'green-text', 'If Clause');
+      }
+      else if(regex.NOWAI.test(lines[i])){
+        addLexeme('NO WAI', 'green-text', 'Else Clause');
+      }
+      else if(regex.OIC.test(lines[i])){
+        addLexeme('OIC', 'green-text', 'Selection Statement Delimeter');
+      }
+      else if(regex.WTF.test(lines[i])){
+        addLexeme('WTF?', 'green-text', 'Switch-case Statement');
+      }
+      else if(regex.OMG.test(lines[i])){
+        addLexeme('OMG', 'green-text', 'Case Statement');
+
+        // get literal
+        var literal = lines[i].substring(4).trim();
+
+        addLexemeLiteral(literal, checkLiteral(literal));
+      }
+      else if(regex.GTFO.test(lines[i])){
+        addLexeme('GTFO', 'green-text', 'Break Statement');
+      }
+      else if(regex.OMGWTF.test(lines[i])){
+        addLexeme('OMGWTF', 'green-text', 'Default Statement');
+      }
       else if(regex.TLDR.test(lines[i])){}
+      else if(regex.literal.test(lines[i])){
+        addLexemeLiteral(lines[i], checkLiteral(lines[i]));
+      }
       else if(lines[i] == ''){}
       else{
         addLexeme(lines[i], 'red-text', 'Unknown Keyword');
@@ -260,12 +300,14 @@ angular.module('app', []).controller('AppController', function($scope){
       var symbol;
       var typeText;
 
-      if($scope.lexemes[$scope.lexemeIndex].lexeme.text == "I HAS A"){
+      if(currentLexeme() == "I HAS A"){
         identifier = $scope.lexemes[++$scope.lexemeIndex].lexeme.text;
 
         addSymbol(identifier, 'NOOB', 'yellow-text', 'NOOB', 'yellow-text');
       }
-      else if($scope.lexemes[$scope.lexemeIndex].lexeme.text == "GIMMEH"){
+      else if(currentLexeme() == 'HAI'){}
+      else if(currentLexeme() == 'KTHXBYE'){}
+      else if(currentLexeme() == "GIMMEH"){
         identifier = $scope.lexemes[++$scope.lexemeIndex].lexeme.text;
         var type = checkLiteral(identifier);
 
@@ -294,7 +336,7 @@ angular.module('app', []).controller('AppController', function($scope){
           printToConsole('SYNTAX ERROR: Invalid variable!')
         }
       }
-      else if($scope.lexemes[$scope.lexemeIndex].lexeme.text == 'ITZ'){
+      else if(currentLexeme() == 'ITZ'){
         // get identifier and value
         identifier = $scope.lexemes[($scope.lexemeIndex - 1)].lexeme.text;
         value = $scope.lexemes[++$scope.lexemeIndex].lexeme.text;
@@ -363,7 +405,7 @@ angular.module('app', []).controller('AppController', function($scope){
         // edit symbol
         editSymbol(identifier, typeText, 'yellow-text', value, valueColor);
       }
-      else if($scope.lexemes[$scope.lexemeIndex].lexeme.text == 'VISIBLE'){
+      else if(currentLexeme() == 'VISIBLE'){
         value = $scope.lexemes[++$scope.lexemeIndex].lexeme.text;
         var type = checkLiteral(value);
 
@@ -431,7 +473,7 @@ angular.module('app', []).controller('AppController', function($scope){
             break;
        }
       }
-      else if($scope.lexemes[$scope.lexemeIndex].lexeme.text == 'R'){
+      else if(currentLexeme() == 'R'){
         identifier = $scope.lexemes[$scope.lexemeIndex - 1].lexeme.text;
         value = $scope.lexemes[++$scope.lexemeIndex].lexeme.text;
 
@@ -498,6 +540,34 @@ angular.module('app', []).controller('AppController', function($scope){
 
         // edit symbol
         editSymbol(identifier, typeText, 'yellow-text', value, valueColor);
+      }
+      else if(regex.expressionToken.test(currentLexeme())){
+        $scope.it = parseLiteral(evaluateExpression());
+      }
+      else if(regex.literal.test(currentLexeme())){
+        $scope.it = parseLiteral(currentLexeme());
+      }
+      else if(regex.ORLY.test(currentLexeme())){
+        $scope.selectionStack.push($scope.it);
+      }
+      else if(regex.YARLY.test(currentLexeme())){
+        if(!$scope.selectionStack[$scope.selectionStack.length - 1]){
+          skipToNext();
+        }
+      }
+      else if(regex.NOWAI.test(currentLexeme())){
+        if($scope.selectionStack[$scope.selectionStack.length - 1]){
+          skipToNext();
+        }
+      }
+      else if(regex.WTF.test(currentLexeme())){
+        $scope.selectionStack.push({
+          it: $scope.it,
+          hasExecuted: false
+        });
+      }
+      else if(regex.OIC.test(currentLexeme())){
+        $scope.selectionStack.pop();
       }
     }
 
@@ -1103,6 +1173,52 @@ angular.module('app', []).controller('AppController', function($scope){
 
   function nextLexeme(){
     return $scope.lexemes[$scope.lexemeIndex + 1].lexeme.text;
+  }
+
+  function skipToNext(){
+    var stack = [];
+
+    if(currentLexeme() == 'YA RLY'){
+      do{
+        if(currentLexeme() == 'YA RLY'){
+          stack.push(true);
+        }
+        else if(currentLexeme() == 'NO WAI'){
+          stack.pop();
+        }
+
+        $scope.lexemeIndex++;
+      } while(stack.length > 0)
+    }
+    else if(currentLexeme() == 'NO WAI'){
+      do{
+        if(currentLexeme() == 'NO WAI'){
+          stack.push(true);
+        }
+        else if(currentLexeme() == 'OIC'){
+          stack.pop();
+        }
+
+        $scope.lexemeIndex++;
+      } while(stack.length > 0)
+    }
+    else if(currentLexeme() == 'OMG'){
+      do{
+        if(currentLexeme() == 'OMG'){
+          stack.push(true);
+        }
+        else if(currentLexeme() == 'GTFO'){
+          stack.pop();
+        }
+
+        $scope.lexemeIndex++;
+      } while(stack.length > 0)
+    }
+    // omg wtf possible bug
+
+    $scope.lexemeIndex--;
+
+    console.log('now at ' + currentLexeme());
   }
 
   function parseLiteral(x, option){
