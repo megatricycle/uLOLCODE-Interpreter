@@ -19,7 +19,7 @@ module.exports = {
 
   'unary': /^NOT/,
 
-  'binary': /^(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF|BOTH OF|EITHER OF|WON OF)/,
+  'binary': /^(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF|BOTH OF|EITHER OF|WON OF|BOTH SAEM OF|DIFFRINT OF)/,
 
   'infinity': /^(ALL OF|ANY OF|SMOOSH)/,
 
@@ -87,5 +87,11 @@ module.exports = {
 
   'GTFO': /^\s*GTFO\s*$/,
 
-  'OMGWTF': /^\s*OMGWTF\s*$/
+  'OMGWTF': /^\s*OMGWTF\s*$/,
+
+  'BOTHSAEMOF': /^\s*BOTH SAEM OF\s+/,
+
+  'DIFFRINTOF': /^\s*DIFFRINT OF\s+/,
+
+  'reserved' : /^(HAI|KTHXBYE|NOT|ITZ|GIMMEH|NOOB|TROOF|NUMBR|NUMBAR|YARN|VISIBLE|R|SMOOSH|BTW|OBTW|NOT|TLDR|OIC|BUKKIT)*$/
 };

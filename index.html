@@ -47,6 +47,11 @@
               </thead>
 
               <tbody>
+                <tr ng-show="it">
+                  <td ng-cloak>IT</td>
+                  <td class="{{it.type.color}}" ng-cloak>{{it.type.text}}</td>
+                  <td class="{{it.value.color}}" ng-cloak>{{it.value.text}}</td>
+                </tr>
                 <tr ng-repeat="symbol in symbolTable">
                   <td ng-cloak>{{symbol.identifier}}</td>
                   <td class="{{symbol.type.color}}" ng-cloak>{{symbol.type.text}}</td>

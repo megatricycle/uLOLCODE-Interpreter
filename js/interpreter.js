@@ -1,5 +1,4 @@
 // @TODO:
-// keyword reserved
 // string typecast to other data types
 // nested operator on infinite operator
 // switch
@@ -97,9 +96,10 @@ angular.module('app', []).controller('AppController', function($scope){
         addLexeme('VISIBLE', 'green-text', 'Output Keyword');
 
         identifier = lines[i].substr(8).trim();
-        type = checkLiteral(identifier);
 
+        type = checkLiteral(identifier);
         addLexemeLiteral(identifier, type);
+
       }
       else if(regex.IHASA.test(lines[i])){
         addLexeme('I HAS A', 'green-text', 'Variable Declaration');
@@ -240,7 +240,11 @@ angular.module('app', []).controller('AppController', function($scope){
         if($scope.lexemes[i].lexeme.text == "I HAS A"){
           identifier = $scope.lexemes[++i].lexeme.text;
           if(!(regex.variable.test(identifier))){
-            $scope.console.push({text: '> SYNTAX ERROR: Invalid variable' });
+            $scope.console.push({text: '> SYNTAX ERROR: Invalid variable next to "I HAS A" expression' });
+            return;
+          }
+          if(regex.reserved.test(identifier)){
+            $scope.console.push({text: '> SYNTAX ERROR: Reserved word or keyword used as variable identifier ' });
             return;
           }
         }
@@ -248,26 +252,55 @@ angular.module('app', []).controller('AppController', function($scope){
         else if($scope.lexemes[i].lexeme.text == "GIMMEH"){
           identifier = $scope.lexemes[++i].lexeme.text;
           if(!(regex.variable.test(identifier))){
-            $scope.console.push({text: '> SYNTAX ERROR: Invalid variable'});
+            $scope.console.push({text: '> SYNTAX ERROR: Invalid variable next to "GIMMEH expression"'});
+            return;
+          }
+          if(regex.reserved.test(identifier)){
+            $scope.console.push({text: '> SYNTAX ERROR: Reserved word or keyword used as variable identifier ' });
             return;
           }
         }
-
         else if($scope.lexemes[i].lexeme.text == "ITZ"){
           identifier = $scope.lexemes[++i].lexeme.text;
-          if(!(checkLiteral(identifier))){ //how to check if it is a literal or not
-            printToConsole('SYNTAX ERROR: Invalid identifier.')
+          var type = checkLiteral(identifier);
+
+          if(type == "invalid"){
+            printToConsole('SYNTAX ERROR: Invalid type next to "ITZ" expression');
+            return;
           }
         }
-
         else if($scope.lexemes[i].lexeme.text == "R"){
           identifier = $scope.lexemes[++i].lexeme.text;
-          if((checkLiteral(identifier))){
-            printToConsole('SYNTAX ERROR: Invalid identifier.')
+          var type = checkLiteral(identifier);
+
+          if(type == "invalid"){
+            printToConsole('SYNTAX ERROR: Invalid type next to "R" expression');
+            return;
           }
+
         }
 
         else if($scope.lexemes[i].lexeme.text == "AN"){
+            // checks if value is string, number, numbar
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "YA RLY"){
+            // checks if value is string, number, numbar
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "NO WAI"){
+            // checks if value is string, number, numbar
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "OMG"){
+            // checks if value is string, number, numbar
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "OMGWTF"){
+            // checks if value is string, number, numbar
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "GTFO"){
             // checks if value is string, number, numbar
         }
 
@@ -427,6 +460,8 @@ angular.module('app', []).controller('AppController', function($scope){
             var expressionValue = evaluateExpression();
             var expressionType = checkLiteral(expressionValue);
 
+            console.log(expressionValue);
+
             switch(expressionType){
               case 'TROOF':
                 if(value == 'WIN') printToConsole('WIN');
@@ -478,6 +513,18 @@ angular.module('app', []).controller('AppController', function($scope){
         value = $scope.lexemes[++$scope.lexemeIndex].lexeme.text;
 
         var valueColor;
+
+        //syntax checking
+        var type = checkLiteral(identifier);
+
+        if(type == "variable"){
+          symbol = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', identifier)];
+        }
+
+        if(!symbol){
+          printToConsole("SYNTAX ERROR: Variable does not exist.");
+          return;
+        }
 
         // identify typeText
         if(regex.NOOB.test(value)){
@@ -542,27 +589,91 @@ angular.module('app', []).controller('AppController', function($scope){
         editSymbol(identifier, typeText, 'yellow-text', value, valueColor);
       }
       else if(regex.expressionToken.test(currentLexeme())){
-        $scope.it = parseLiteral(evaluateExpression());
+        var it = {
+          type: {
+            text: null,
+            color: 'yellow-text'
+          },
+          value: {
+            text: parseLiteral(evaluateExpression(), 'lol'),
+            color: null
+          }
+        };
+
+        // get type
+        it.type.text = checkLiteral(it.value.text);
+
+        // get color
+
+        switch(typeText){
+          case 'NOOB':
+            it.value.color = 'yellow-text';
+            break;
+          case 'TROOF':
+            it.value.color = 'red-text';
+            break;
+          case 'NUMBR':
+          case 'NUMBAR':
+            it.value.color = 'white-text';
+            break;
+          case 'YARN':
+            it.value.color = 'blue-text';
+            break;
+        }
+
+        $scope.it = it;
       }
       else if(regex.literal.test(currentLexeme())){
-        $scope.it = parseLiteral(currentLexeme());
+        var it = {
+          type: {
+            text: null,
+            color: 'yellow-text'
+          },
+          value: {
+            text: parseLiteral(currentLexeme(), 'lol'),
+            color: null
+          }
+        };
+
+        // get type
+        it.type.text = checkLiteral(it.value.text);
+
+        // get color
+
+        switch(typeText){
+          case 'NOOB':
+            it.value.color = 'yellow-text';
+            break;
+          case 'TROOF':
+            it.value.color = 'red-text';
+            break;
+          case 'NUMBR':
+          case 'NUMBAR':
+            it.value.color = 'white-text';
+            break;
+          case 'YARN':
+            it.value.color = 'blue-text';
+            break;
+        }
+
+        $scope.it = it;
       }
       else if(regex.ORLY.test(currentLexeme())){
-        $scope.selectionStack.push($scope.it);
+        $scope.selectionStack.push($scope.it.value.text);
       }
       else if(regex.YARLY.test(currentLexeme())){
-        if(!$scope.selectionStack[$scope.selectionStack.length - 1]){
+        if($scope.selectionStack[$scope.selectionStack.length - 1] == 'FAIL'){
           skipToNext();
         }
       }
       else if(regex.NOWAI.test(currentLexeme())){
-        if($scope.selectionStack[$scope.selectionStack.length - 1]){
+        if($scope.selectionStack[$scope.selectionStack.length - 1] == 'WIN'){
           skipToNext();
         }
       }
       else if(regex.WTF.test(currentLexeme())){
         $scope.selectionStack.push({
-          it: $scope.it,
+          it: $scope.it.value.text,
           hasExecuted: false
         });
       }
@@ -706,6 +817,7 @@ angular.module('app', []).controller('AppController', function($scope){
       // variable
       return 'variable';
     }
+    else return 'invalid';
   }
 
   function addLexemeLiteral(value, type){
@@ -798,6 +910,11 @@ angular.module('app', []).controller('AppController', function($scope){
 
         addLexeme(operation, 'green-text', operator);
         break;
+
+      case 'invalid':
+        value = value.substring(1, value.length - 1);
+        addLexeme(value, 'red-text', 'Invalid keyword');
+        break;
       case 'expression':
         var operator;
         var operation;
@@ -870,8 +987,6 @@ angular.module('app', []).controller('AppController', function($scope){
             operation = 'DIFFRINT OF';
             operator = 'Inequality Operator';
           }
-
-          // @TODO: other operations
 
           addLexeme(operation, 'green-text', operator);
 
@@ -966,16 +1081,17 @@ angular.module('app', []).controller('AppController', function($scope){
     i = 0;
     var c = 0;
 
-    do{
-      if(a[i] == 'SUM OF' || a[i] == 'DIFF OF' || a[i] == 'PRODUKT OF' || a[i] == 'QUOSHUNT OF' || a[i] == 'MOD OF' || a[i] == 'BIGGR OF' || a[i] == 'SMALLR OF' || a[i] == 'BOTH OF'  || a[i] == 'EITHER OF' || a[i] == 'WON OF' || a[i] == 'BOTH SAEM OF' || a[i] == 'DIFFRINT OF'){
-        stack.push(0);
+    for(i = 0; i < a.length; i++){
+      if(a[i] == 'SUM OF' || a[i] == 'DIFF OF' || a[i] == 'PRODUKT OF' || a[i] == 'QUOSHUNT OF' || a[i] == 'MOD OF' || a[i] == 'BIGGR OF' || a[i] == 'SMALLR OF' || a[i] == 'BOTH OF' || a[i] == 'EITHER OF' || a[i] == 'WON OF' || a[i] == 'BOTH SAEM OF' || a[i] == 'DIFFRINT OF'){
+        stack.push(a[i]);
       }
       else if(a[i] == 'AN'){
+        if(stack.length == 0) break;
+
         stack.pop();
         c++;
       }
-      i++;
-    }while(stack.length)
+    }
 
     var o = 0;
 
@@ -1122,7 +1238,6 @@ angular.module('app', []).controller('AppController', function($scope){
       }
 
       // return
-      $scope.lexemeIndex--;
       return ret;
     }
   }
@@ -1161,6 +1276,12 @@ angular.module('app', []).controller('AppController', function($scope){
         return true;
       case 'WON OF':
         $scope.operationStack.push(((firstOperand? !secondOperand: secondOperand)? 'WIN': 'FAIL') + '');
+        return true;
+      case 'BOTH SAEM OF':
+        $scope.operationStack.push((firstOperand == secondOperand? 'WIN': 'FAIL') + '');
+        return true;
+      case 'DIFFRINT OF':
+        $scope.operationStack.push((firstOperand != secondOperand? 'WIN': 'FAIL') + '');
         return true;
       default:
         return false;
@@ -1217,8 +1338,6 @@ angular.module('app', []).controller('AppController', function($scope){
     // omg wtf possible bug
 
     $scope.lexemeIndex--;
-
-    console.log('now at ' + currentLexeme());
   }
 
   function parseLiteral(x, option){
