@@ -73,7 +73,7 @@ module.exports = {
 
   'TLDR': /^\s*TLDR\s*$/,
 
-  'ORLY': /^\s*ORLY\?\s*$/,
+  'ORLY': /^\s*O RLY\?\s*$/,
 
   'YARLY': /^\s*YA RLY\s*$/,
 

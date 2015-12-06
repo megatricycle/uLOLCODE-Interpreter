@@ -166,10 +166,6 @@ angular.module('app', []).controller('AppController', function($scope){
         addLexemeLiteral(identifier[1], checkLiteral(identifier[1]));
       }
       // comment
-      else if(regex.BTW.test(lines[i])){
-        // add lexeme
-        addLexeme('BTW', 'grey-text', 'Comment Delimiter');
-      }
       else if(regex.OBTW.test(lines[i])){
         // set ignore to true
         ignore = true;
@@ -177,12 +173,16 @@ angular.module('app', []).controller('AppController', function($scope){
         // add lexeme
         addLexeme('OBTW', 'grey-text', 'Comment Delimiter');
       }
+      else if(regex.BTW.test(lines[i])){
+        // add lexeme
+        addLexeme('BTW', 'grey-text', 'Comment Delimiter');
+      }
       // operations
       else if(regex.expression.test(lines[i])){
         addLexemeLiteral(lines[i], 'expression');
       }
       else if(regex.ORLY.test(lines[i])){
-        addLexeme('ORLY?', 'white-text', 'If-then Statement');
+        addLexeme('O RLY?', 'white-text', 'If-then Statement');
       }
       else if(regex.YARLY.test(lines[i])){
         addLexeme('YA RLY', 'green-text', 'If Clause');
