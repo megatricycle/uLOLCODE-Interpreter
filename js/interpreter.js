@@ -240,10 +240,12 @@ angular.module('app', []).controller('AppController', function($scope){
         //checking for aditional HAI and KTHXBYE
         if($scope.lexemes[i].lexeme.text == "HAI"){
           printToConsole('SYNTAX ERROR: Invalid "HAI" expression');
+          return;
         }
 
         else if($scope.lexemes[i].lexeme.text == "KTHXBYE"){
           printToConsole('SYNTAX ERROR: Invalid "KTHXBYE" expression');
+          return;
         }
 
         //checking for unary, binary, infiniteArityDelimeter
