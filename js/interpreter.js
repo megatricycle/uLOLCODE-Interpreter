@@ -1,14 +1,14 @@
 // @TODO:
 // string implicit typecast to other data types
 // nested operator on infinite operator
-// switch
+// yarn on operations
 // visible infinite arity
 // suppress visible new line
+// DIFFRINT OF -> DIFFRINT
 
 // at wtf, push it value to selection stack and executedFlag
 // at case, skip when it != top of selection stack
 // at OMGWTF, skip when top of selection stack has executedFLag
-// at oic, pop selection stack
 
 // angular part
 angular.module('app', []).controller('AppController', function($scope){
@@ -21,6 +21,7 @@ angular.module('app', []).controller('AppController', function($scope){
   $scope.operationStack = [];
   $scope.it = null;
   $scope.selectionStack = [];
+  $scope.runningMode = false;
   $scope.buttonText = function(){
     if($scope.state == "input") return "RUNNING";
     return "EXECUTE";
@@ -40,8 +41,10 @@ angular.module('app', []).controller('AppController', function($scope){
     // clear values
     $scope.lexemes = [];
     $scope.symbolTable = [];
-    $scope.variables = [];
     $scope.operationStack = [];
+    $scope.it = null;
+    $scope.selectionStack = [];
+    $scope.runningMode = false;
 
     // set lexemeIndex
     $scope.lexemeIndex = 0;
@@ -194,6 +197,9 @@ angular.module('app', []).controller('AppController', function($scope){
       }
       else if(regex.WTF.test(lines[i])){
         addLexeme('WTF?', 'green-text', 'Switch-case Statement');
+      }
+      else if(regex.OMGWTF.test(lines[i])){
+        addLexeme('OMGWTF', 'green-text', 'Switch-case Default');
       }
       else if(regex.OMG.test(lines[i])){
         addLexeme('OMG', 'green-text', 'Case Statement');
@@ -600,7 +606,7 @@ angular.module('app', []).controller('AppController', function($scope){
             color: 'yellow-text'
           },
           value: {
-            text: parseLiteral(evaluateExpression(), 'lol'),
+            text: parseLiteral(evaluateExpression(), 'lol', 'stringify'),
             color: null
           }
         };
@@ -610,42 +616,7 @@ angular.module('app', []).controller('AppController', function($scope){
 
         // get color
 
-        switch(typeText){
-          case 'NOOB':
-            it.value.color = 'yellow-text';
-            break;
-          case 'TROOF':
-            it.value.color = 'red-text';
-            break;
-          case 'NUMBR':
-          case 'NUMBAR':
-            it.value.color = 'white-text';
-            break;
-          case 'YARN':
-            it.value.color = 'blue-text';
-            break;
-        }
-
-        $scope.it = it;
-      }
-      else if(regex.literal.test(currentLexeme())){
-        var it = {
-          type: {
-            text: null,
-            color: 'yellow-text'
-          },
-          value: {
-            text: parseLiteral(currentLexeme(), 'lol'),
-            color: null
-          }
-        };
-
-        // get type
-        it.type.text = checkLiteral(it.value.text);
-
-        // get color
-
-        switch(typeText){
+        switch(it.type.text){
           case 'NOOB':
             it.value.color = 'yellow-text';
             break;
@@ -665,13 +636,16 @@ angular.module('app', []).controller('AppController', function($scope){
       }
       else if(regex.ORLY.test(currentLexeme())){
         $scope.selectionStack.push($scope.it.value.text);
+        console.log($scope.selectionStack);
       }
       else if(regex.YARLY.test(currentLexeme())){
+        console.log('yarly');
         if($scope.selectionStack[$scope.selectionStack.length - 1] == 'FAIL'){
           skipToNext();
         }
       }
       else if(regex.NOWAI.test(currentLexeme())){
+        console.log('nowai');
         if($scope.selectionStack[$scope.selectionStack.length - 1] == 'WIN'){
           skipToNext();
         }
@@ -682,8 +656,79 @@ angular.module('app', []).controller('AppController', function($scope){
           hasExecuted: false
         });
       }
+      else if(regex.OMGWTF.test(currentLexeme())){}
+      else if(regex.OMG.test(currentLexeme())){
+        // if next literal == it, set running mode to true and lexemeIndex++ parseLiteral($scope.it.value.text, null, 'stringify')));
+        if(parseLiteral(nextLexeme()) == parseLiteral($scope.it.value.text, null, 'stringify')){
+          if(nextLexeme() == '"'){
+            $scope.lexemeIndex += 3;
+          }
+          else{
+            $scope.lexemeIndex++;
+          }
+          $scope.runningMode = true;
+
+          // alert('yey');
+        }
+        else if($scope.runningMode){
+          $scope.lexemeIndex++;
+        }
+        // else skip
+        else{
+          skipToNext();
+        }
+      }
+      else if(regex.GTFO.test(currentLexeme())){
+        skipToNext();
+      }
       else if(regex.OIC.test(currentLexeme())){
+        $scope.runningMode = false;
         $scope.selectionStack.pop();
+      }
+      else if(regex.literal.test(currentLexeme())){
+        var text;
+
+        if(currentLexeme() == '"'){
+          text = '"' + nextLexeme() + '"';
+          $scope.lexemeIndex += 2;
+        }
+        else{
+          text = parseLiteral(currentLexeme(), 'lol', 'stringify');
+        }
+
+        var it = {
+          type: {
+            text: null,
+            color: 'yellow-text'
+          },
+          value: {
+            text: text,
+            color: null
+          }
+        };
+
+        // get type
+        it.type.text = checkLiteral(it.value.text);
+
+        // get color
+
+        switch(it.type.text){
+          case 'NOOB':
+            it.value.color = 'yellow-text';
+            break;
+          case 'TROOF':
+            it.value.color = 'red-text';
+            break;
+          case 'NUMBR':
+          case 'NUMBAR':
+            it.value.color = 'white-text';
+            break;
+          case 'YARN':
+            it.value.color = 'blue-text';
+            break;
+        }
+
+        $scope.it = it;
       }
     }
 
@@ -1161,7 +1206,6 @@ angular.module('app', []).controller('AppController', function($scope){
           leftOperand = parseLiteral(leftOperand);
 
           var operatedFlag = false;
-
           operatedFlag = evaluateOperation(operator, leftOperand, rightOperand);
 
           if($scope.operationStack.length == 1){
@@ -1176,7 +1220,11 @@ angular.module('app', []).controller('AppController', function($scope){
           }
         }
 
-        if(currentLexeme() != 'AN'){
+        if(currentLexeme() == '"'){
+          $scope.operationStack.push('"' + nextLexeme() + '"');
+          $scope.lexemeIndex += 2;
+        }
+        else if(currentLexeme() != 'AN'){
           $scope.operationStack.push(currentLexeme());
         }
         $scope.lexemeIndex++;
@@ -1330,22 +1378,20 @@ angular.module('app', []).controller('AppController', function($scope){
     }
     else if(currentLexeme() == 'OMG'){
       do{
-        if(currentLexeme() == 'OMG'){
-          stack.push(true);
-        }
-        else if(currentLexeme() == 'GTFO'){
-          stack.pop();
-        }
-
         $scope.lexemeIndex++;
-      } while(stack.length > 0)
+      } while(currentLexeme() != 'OMG' && currentLexeme() != 'OIC' && currentLexeme() != 'OMGWTF');
+    }
+    else if(currentLexeme() == 'GTFO'){
+      do{
+        $scope.lexemeIndex++;
+      } while(currentLexeme() != 'OIC');
     }
     // omg wtf possible bug
 
     $scope.lexemeIndex--;
   }
 
-  function parseLiteral(x, option){
+  function parseLiteral(x, option1, option2){
     if(regex.NUMBR.test(x)){
       return parseInt(x);
     }
@@ -1353,19 +1399,23 @@ angular.module('app', []).controller('AppController', function($scope){
       return parseFloat(x);
     }
     else if(regex.TROOF.test(x)){
-      if(option == 'lol'){
+      if(option1 == 'lol'){
         return x == 'WIN'? 'WIN': 'FAIL';
       }
       else{
         return x == 'WIN'? true: false;
       }
     }
+    else if(x == '"'){
+      return '"' + $scope.lexemes[$scope.lexemeIndex + 2].lexeme.text + '"';
+    }
     else if(regex.YARN.test(x)){
+      if(option2 == 'stringify') return x;
       return x.substring(1, x.length - 1);
     }
     else if(regex.variable.test(x)){
       x = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', x)].value.text;
-      return parseLiteral(x);
+      return parseLiteral(x, option1, option2);
     }
   }
 });

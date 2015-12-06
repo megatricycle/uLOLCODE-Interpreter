@@ -11,7 +11,7 @@ module.exports = {
 
   'variable': /^[A-Za-z][A-Za-z0-9_]*$/,
 
-  'literal': /^(NOOB|WIN|FAIL|-?\d+|-?\d+\.\d+|".*"|[A-Za-z][A-Za-z0-9_]*)$/,
+  'literal': /^(NOOB|WIN|FAIL|-?\d+|-?\d+\.\d+|".*"|[A-Za-z][A-Za-z0-9_]*|")$/,
 
   'expression': /^(SUM OF .+ AN .+|DIFF OF .+ AN .+|PRODUKT OF .+ AN .+|QUOSHUNT OF .+ AN .+|MOD OF .+ AN .+|BIGGR OF .+ AN .+|SMALLR OF .+ AN .+|BOTH OF .+ AN .+|EITHER OF .+ AN .+|WON OF .+ AN .+|NOT .+|ALL OF .+ AN .+ MKAY|EITHER OF .+ AN .+ MKAY|BOTH SAEM OF .+ AN .+|DIFFRINT OF .+ AN .+|ALL OF .+|ANY OF .+|SMOOSH .+)$/,
 
@@ -83,7 +83,7 @@ module.exports = {
 
   'WTF': /^\s*WTF\?\s*$/,
 
-  'OMG': /^\s*OMG\s+/,
+  'OMG': /^\s*OMG\s*/,
 
   'GTFO': /^\s*GTFO\s*$/,
 
