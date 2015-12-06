@@ -2,7 +2,6 @@
 // nested operator on infinite operator
 // visible infinite arity
 // suppress visible new line
-// DIFFRINT OF -> DIFFRINT
 
 // at wtf, push it value to selection stack and executedFlag
 // at case, skip when it != top of selection stack
