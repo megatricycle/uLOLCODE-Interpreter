@@ -235,11 +235,11 @@ angular.module('app', []).controller('AppController', function($scope){
   $scope.checkSyntaxErrors = function(){
       //checking if the first delimiter is HAI
       if(!(/^\s*HAI\s*$/.test($scope.lexemes[0].lexeme.text))){
-        $scope.console.push({text: '> SYNTAX ERROR: Expected delimiter: HAI on line 1'});
+        printToConsole('SYNTAX ERROR: Expected delimiter: HAI on line 1');
         return;
       } //checking if the last delimiter is KTHXBYE
       else if(!(/^\s*KTHXBYE\s*$/.test($scope.lexemes[($scope.lexemes.length)-1].lexeme.text))){
-        $scope.console.push({text: '> SYNTAX ERROR: Expected delimiter: KTHXBYE on last line'});
+        printToConsole('SYNTAX ERROR: Expected delimiter: KTHXBYE on last line');
         return;
       }
 
@@ -291,20 +291,27 @@ angular.module('app', []).controller('AppController', function($scope){
         }
 
         else if($scope.lexemes[i].lexeme.text == "AN"){
-            // checks if value is string, number, numbar
+          identifier =  $scope.lexemes[++i].lexeme.text;
+          if(identifier == "AN"){
+            printToConsole('SYNTAX ERROR: Cannot use AN after AN expression');
+          }
         }
 
-        else if($scope.lexemes[i].lexeme.text == "YA RLY"){
-            // checks if value is string, number, numbar
+        else if($scope.lexemes[i].lexeme.text == "O RLY?"){
+          identifier =  $scope.lexemes[++i].lexeme.text;
+          if(identifier != "YA RLY"){
+            printToConsole('SYNTAX ERROR: Expected expression after "O RLY?"');
+          }
         }
 
-        else if($scope.lexemes[i].lexeme.text == "NO WAI"){
-            // checks if value is string, number, numbar
+        else if($scope.lexemes[i].lexeme.text == "VISIBLE"){
+          identifier = $scope.lexemes[++i].lexeme.text;
+          if(regex.reserved.test(identifier)){
+            printToConsole('SYNTAX ERROR: Reserved word or keyword used as variable identifier ');
+            return;
+          }
         }
 
-        else if($scope.lexemes[i].lexeme.text == "OMG"){
-            // checks if value is string, number, numbar
-        }
 
         else if($scope.lexemes[i].lexeme.text == "OMGWTF"){
             // checks if value is string, number, numbar
@@ -320,10 +327,9 @@ angular.module('app', []).controller('AppController', function($scope){
 
         else if($scope.lexemes[i].lexeme.text == "OBTW"){
           identifier = $scope.lexemes[++i].lexeme.text;
-          var type = checkLiteral(identifier);
 
-          if(type != "TLDR"){
-            printToConsole('SYNTAX ERROR: Invalid type next to "OBTW" expression');
+          if(identifier != "TLDR"){
+            printToConsole('SYNTAX ERROR: No closing in "OBTW" expression');
             return;
           }
         }
@@ -1306,6 +1312,31 @@ angular.module('app', []).controller('AppController', function($scope){
   }
 
   function evaluateOperation(operator, firstOperand, secondOperand){
+    //runtime syntax checking
+    if(regex.arithmeticExpression.test(operator)){
+      if(!( regex.NUMBR.test(firstOperand) || regex.NUMBAR.test(firstOperand) || regex.YARN.test(firstOperand) )){
+        printToConsole('SYNTAX ERROR: Invalid first operand');
+        return false;
+      }
+
+      if(!( regex.NUMBR.test(secondOperand) || regex.NUMBAR.test(secondOperand) || regex.YARN.test(secondOperand) )){
+        printToConsole('SYNTAX ERROR: Invalid second operand');
+        return false;
+      }
+    }
+
+    if(regex.booleanExpression.test(operator)){
+      if(!( firstOperand === true || firstOperand === false)){
+        printToConsole('SYNTAX ERROR: Invalid first operand');
+        return false;
+      }
+      if(!( secondOperand === true || secondOperand === false)){
+        printToConsole('SYNTAX ERROR: Invalid second operand');
+        return false;
+      }
+    }
+
+
     switch(operator){
       case 'NOT':
         $scope.operationStack.push((firstOperand? 'FAIL': 'WIN') + '');
