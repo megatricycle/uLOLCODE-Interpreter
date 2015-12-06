@@ -4,9 +4,6 @@ var ipc = require('ipc');
 var fs = require('fs');
 var dialog = require('dialog');
 
-// Report crashes to our server.
-require('crash-reporter').start();
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 var mainWindow = null;

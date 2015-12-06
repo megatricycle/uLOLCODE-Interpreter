@@ -1,3 +1,7 @@
+/*
+  All regular expressions that will be used by the application.
+*/
+
 module.exports = {
   'NOOB': /^NOOB$/,
 
