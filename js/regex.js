@@ -37,9 +37,9 @@ module.exports = {
 
   'ITZ': / ITZ /,
 
-  'GIMMEH': /\s*GIMMEH\s+/,
+  'GIMMEH': /^\s*GIMMEH\s+/,
 
-  'R': /\s*[A-Za-z][A-Za-z0-9_]*\s+R\s+.+\s*$/,
+  'R': /^\s*[A-Za-z][A-Za-z0-9_]*\s+R\s+.+\s*$/,
 
   'SMOOSH': /\s*SMOOSH\s+/,
 

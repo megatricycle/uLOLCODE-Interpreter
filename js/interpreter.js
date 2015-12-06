@@ -229,25 +229,8 @@ angular.module('app', []).controller('AppController', function($scope){
       for(var i=1; i<($scope.lexemes.length)-1; i++){
         var identifier;
 
-        //checking for unary, binary, infiniteArityDelimeter
-        if(regex.unary.test($scope.lexemes[i].lexeme.text)){
-          identifier = $scope.lexemes[i+2].lexeme.text;
-          if(identifier == "AN"){
-            printToConsole('SYNTAX ERROR: Cannot append. Unary operation.');
-            return;
-          }
-        }
-
-        else if(regex.binary.test($scope.lexemes[i].lexeme.text)){
-          identifier = $scope.lexemes[i+4].lexeme.text;
-          if(identifier == "AN"){
-            printToConsole('SYNTAX ERROR: Cannot append. Binary operation.');
-            return;
-          }
-        }
-
         //checking for etc
-        else if($scope.lexemes[i].lexeme.text == "I HAS A"){
+        if($scope.lexemes[i].lexeme.text == "I HAS A"){
           identifier = $scope.lexemes[++i].lexeme.text;
           if(!(regex.variable.test(identifier))){
             printToConsole('SYNTAX ERROR: Invalid variable next to "I HAS A" expression');
@@ -954,6 +937,15 @@ angular.module('app', []).controller('AppController', function($scope){
           operation = 'NOT';
           operator = 'Negation Operator';
         }
+        else if(value == 'ALL OF'){
+          operation = 'ALL OF';
+          operator = 'Infinite Arity And';
+        }
+        else if(value == 'ANY OF'){
+          operation = 'ANY OF';
+          operator = 'Infinite Arity Or';
+        }
+
 
         addLexeme(operation, 'green-text', operator);
         break;
@@ -1109,7 +1101,7 @@ angular.module('app', []).controller('AppController', function($scope){
     }
 
     for(var i = 0; i < a.length; i++){
-      if(a[i] == 'SUM' || a[i] == 'DIFF' || a[i] == 'PRODUKT' || a[i] == 'QUOSHUNT' || a[i] == 'MOD' || a[i] == 'BIGGR' || a[i] == 'SMALLR' || a[i] == 'BOTH' || a[i] == 'EITHER' || a[i] == 'WON' || a[i] == 'DIFFRINT'){
+      if(a[i] == 'SUM' || a[i] == 'DIFF' || a[i] == 'PRODUKT' || a[i] == 'QUOSHUNT' || a[i] == 'MOD' || a[i] == 'BIGGR' || a[i] == 'SMALLR' || a[i] == 'BOTH' || a[i] == 'EITHER' || a[i] == 'WON' || a[i] == 'DIFFRINT' || a[i] == 'ALL' || a[i] == 'ANY'){
         a[i] = a[i] + ' ' +a[i + 1];
         a.splice(i + 1, 1);
       }
@@ -1133,6 +1125,8 @@ angular.module('app', []).controller('AppController', function($scope){
       }
     }
 
+    console.log(a);
+
     var stack = [];
 
     i = 0;
@@ -1154,12 +1148,16 @@ angular.module('app', []).controller('AppController', function($scope){
 
     for(i = 0; i < s.length; i++){
       if('AN' == s.charAt(i) + s.charAt(i + 1)){
-        o++;
-        if(o == c + 1) break;
+        if(s.charAt(i - 1) == ' ' && s.charAt(i + 2) == ' '){
+          o++;
+          if(o == c + 1) break;
+        }
       }
     }
 
-    return [string.substring(0, i), string.substring(i + 3)]
+    console.log([string.substring(0, i), string.substring(i + 3)]);
+
+    return [string.substring(0, i), string.substring(i + 3)];
   }
 
   /*
@@ -1296,6 +1294,7 @@ angular.module('app', []).controller('AppController', function($scope){
 
       // evaluate the whole stack with the operator
       var ret;
+      console.log(infiniteStack);
       if(operator == 'ALL OF'){
         if(infiniteStack.indexOf('FAIL') == -1) ret = 'WIN';
         else ret = 'FAIL';
@@ -1304,6 +1303,8 @@ angular.module('app', []).controller('AppController', function($scope){
         if(infiniteStack.indexOf('WIN') == -1) ret = 'FAIL';
         else ret = 'WIN';
       }
+
+      console.log(ret);
 
       // return
       return ret;
@@ -1321,11 +1322,13 @@ angular.module('app', []).controller('AppController', function($scope){
     if(regex.arithmeticExpression.test(operator)){
       if(!( regex.NUMBR.test(firstOperand) || regex.NUMBAR.test(firstOperand) || regex.YARN.test(firstOperand) )){
         printToConsole('RUNTIME ERROR: Invalid first operand');
+        throwError();
         return false;
       }
 
       if(!( regex.NUMBR.test(secondOperand) || regex.NUMBAR.test(secondOperand) || regex.YARN.test(secondOperand) )){
         printToConsole('RUNTIME ERROR: Invalid second operand');
+        throwError();
         return false;
       }
     }
@@ -1333,10 +1336,12 @@ angular.module('app', []).controller('AppController', function($scope){
     if(regex.booleanExpression.test(operator)){
       if(!( firstOperand === true || firstOperand === false)){
         printToConsole('RUNTIME ERROR: Invalid first operand');
+        throwError();
         return false;
       }
       if(!( secondOperand === true || secondOperand === false)){
         printToConsole('RUNTIME ERROR: Invalid second operand');
+        throwError();
         return false;
       }
     }
@@ -1477,6 +1482,7 @@ angular.module('app', []).controller('AppController', function($scope){
     else if(regex.variable.test(x)){
        if(!($scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', x)])){
          printToConsole('RUNTIME ERROR: Variable does not exist');
+         throwError();
          throwError();
        }
       x = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', x)].value.text;
