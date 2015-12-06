@@ -1,4 +1,7 @@
 // @TODO:
+//syntax checking -> visible "
+//syntax checking -> var r "
+
 // nested operator on infinite operator
 // suppress visible new line
 
@@ -300,14 +303,6 @@ angular.module('app', []).controller('AppController', function($scope){
           }
         }
 
-        else if($scope.lexemes[i].lexeme.text == "VISIBLE"){
-          identifier = $scope.lexemes[++i].lexeme.text;
-          if(regex.reserved.test(identifier)){
-            printToConsole('SYNTAX ERROR: Reserved word or keyword used as variable identifier ');
-            return;
-          }
-        }
-
         else if($scope.lexemes[i].lexeme.text == "OBTW"){
           identifier = $scope.lexemes[++i].lexeme.text;
           if(identifier != "TLDR"){
@@ -475,9 +470,9 @@ angular.module('app', []).controller('AppController', function($scope){
         }
 
         if(ret.indexOf('"') == 0) printToConsole(ret.substring(ret.indexOf('"') + 1, ret.length - 1));
+        else if(ret.indexOf('"') > 0) printToConsole(ret.substring(0, ret.indexOf('"'))+ret.substring(ret.indexOf('"') + 1, ret.length - 1));
         else printToConsole(ret);
-        // edit symbol
-        editSymbol(identifier, typeText, 'yellow-text', value, valueColor);
+
       }
       else if($scope.lexemes[$scope.lexemeIndex].lexeme.text == 'R'){
         identifier = $scope.lexemes[$scope.lexemeIndex - 1].lexeme.text;
@@ -757,7 +752,7 @@ angular.module('app', []).controller('AppController', function($scope){
     var index = $scope.symbolTable.indexOfAttr('identifier',  identifier);
 
     if(index == -1){
-      printToConsole('RUNTIME ERROR: Variable does noT exist');
+      printToConsole('RUNTIME ERROR: Variable does not exist');
       throw 'Invalid index';
     }
 
