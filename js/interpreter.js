@@ -1,6 +1,6 @@
 // @TODO:
 // nested operator on infinite operator
-// visible infinite arity
+// visible infinite arity (RE-CHECK)
 // suppress visible new line
 
 // at wtf, push it value to selection stack and executedFlag
@@ -98,15 +98,6 @@ angular.module('app', []).controller('AppController', function($scope){
       }
       else if(regex.KTHXBYE.test(lines[i])){
         addLexeme('KTHXBYE', 'green-text', 'Code Delimeter');
-      }
-      else if(regex.VISIBLE.test(lines[i])){
-        addLexeme('VISIBLE', 'green-text', 'Output Keyword');
-
-        identifier = lines[i].substr(8).trim();
-
-        type = checkLiteral(identifier);
-        addLexemeLiteral(identifier, type);
-
       }
       else if(regex.IHASA.test(lines[i])){
         addLexeme('I HAS A', 'green-text', 'Variable Declaration');
@@ -449,150 +440,34 @@ angular.module('app', []).controller('AppController', function($scope){
         editSymbol(identifier, typeText, 'yellow-text', value, valueColor);
       }
       else if(currentLexeme() == 'VISIBLE'){
-        value = $scope.lexemes[++$scope.lexemeIndex].lexeme.text;
-        var type = checkLiteral(value);
+        $scope.lexemeIndex++;
 
-       switch(type){
-          case 'TROOF':
-            if(value == 'WIN') printToConsole('WIN');
-            else printToConsole('FAIL');
+        var ret = '';
+
+        // concatenate
+        while(true){
+          if(currentLexeme() == '"'){
+            ret += nextLexeme();
+            $scope.lexemeIndex += 2;
+          }
+          else if(regex.expressionToken.test(currentLexeme())){
+            ret += evaluateExpression();
+          }
+          else if(regex.literal.test(currentLexeme())){
+            ret += parseLiteral(currentLexeme(), 'lol');
+          }
+
+          if(nextLexeme() != 'AN'){
             break;
-          case 'NOOB':
-          case 'NUMBR':
-          case 'NUMBAR':
-            printToConsole(value);
-            break;
-          case 'YARN':
-            printToConsole($scope.lexemes[++$scope.lexemeIndex].lexeme.text);
+          }
+          else{
             $scope.lexemeIndex++;
-            break;
-          case 'expressionToken':
-            var expressionValue = evaluateExpression();
-            var expressionType = checkLiteral(expressionValue);
+          }
 
-            switch(expressionType){
-              case 'TROOF':
-                if(value == 'WIN') printToConsole('WIN');
-                else printToConsole('FAIL');
-                break;
-              case 'NOOB':
-              case 'NUMBR':
-              case 'NUMBAR':
-                printToConsole(expressionValue);
-                break;
-              case 'YARN':
-                printToConsole(expressionValue.substr(1, expressionValue.length - 2));
-                break;
-            }
-
-            break;
-          case 'variable':
-            symbol = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', value)];
-
-            if(!symbol){
-              printToConsole("SYNTAX ERROR: Variable does not exist.");
-              return;
-            }
-            else{
-              typeText = symbol.type.text;
-              value = symbol.value.text;
-            }
-
-            switch(typeText){
-              case 'TROOF':
-                if(value == 'WIN') printToConsole('WIN');
-                else printToConsole('FAIL');
-                break;
-              case 'NOOB':
-              case 'NUMBR':
-              case 'NUMBAR':
-                printToConsole(value);
-                break;
-              case 'YARN':
-                printToConsole(value.substr(1, value.length - 2));
-                break;
-            }
-
-            break;
-       }
-      }
-      else if(currentLexeme() == 'R'){
-        identifier = $scope.lexemes[$scope.lexemeIndex - 1].lexeme.text;
-        value = $scope.lexemes[++$scope.lexemeIndex].lexeme.text;
-
-        var valueColor;
-
-        //syntax checking
-        var type = checkLiteral(identifier);
-
-        if(type == "variable"){
-          symbol = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', identifier)];
-        }
-
-        if(!symbol){
-          printToConsole("SYNTAX ERROR: Variable does not exist.");
-          return;
-        }
-
-        // identify typeText
-        if(regex.NOOB.test(value)){
-          // NOOB
-          typeText = 'NOOB';
-          valueColor = 'yellow-text';
-        }
-        else if(regex.TROOF.test(value)){
-          // TROOF
-          typeText = 'TROOF';
-          valueColor = 'red-text';
-        }
-        else if(regex.NUMBR.test(value)){
-          // NUMBR
-          typeText = 'NUMBR';
-          valueColor = 'white-text';
-        }
-        else if(regex.NUMBAR.test(value)){
-          // NUMBAR
-          typeText = 'NUMBAR';
-          valueColor = 'white-text';
-        }
-        else if(value == '"'){
-          // YARN
-          typeText = 'YARN';
-          valueColor = 'blue-text';
-
-          value = '"' + $scope.lexemes[++$scope.lexemeIndex].lexeme.text + '"';
           $scope.lexemeIndex++;
         }
-        else if(regex.expressionToken.test(value)){
-          value = evaluateExpression();
-          typeText = checkLiteral(value);
 
-          switch(typeText){
-            case 'NOOB':
-              valueColor = 'yellow-text';
-              break;
-            case 'TROOF':
-              valueColor = 'red-text';
-              break;
-            case 'NUMBR':
-            case 'NUMBAR':
-              valueColor = 'white-text';
-              break;
-            case 'YARN':
-              valueColor = 'blue-text';
-              break;
-          }
-        }
-        else{
-          // variable
-          // get symbol object
-          symbol = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', value)];
-
-          typeText = symbol.type.text;
-          value = symbol.value.text;
-          valueColor = symbol.value.color;
-        }
-
+        printToConsole(ret);
         // edit symbol
         editSymbol(identifier, typeText, 'yellow-text', value, valueColor);
       }
@@ -886,11 +761,11 @@ angular.module('app', []).controller('AppController', function($scope){
         break;
       case 'YARN':
         // omit string delimeters
-        value = value.substring(1, value.length - 1);
-        addLexeme('"', 'blue-text', 'String Delimeter');
-        addLexeme(value, 'blue-text', 'String Literal');
-        addLexeme('"', 'blue-text', 'String Delimeter');
-        break;
+          value = value.substring(1, value.length - 1);
+          addLexeme('"', 'blue-text', 'String Delimeter');
+          addLexeme(value, 'blue-text', 'String Literal');
+          addLexeme('"', 'blue-text', 'String Delimeter');
+          break;
       case 'variable':
         addLexeme(value, 'white-text', 'Variable Identifier');
         break;
@@ -1076,6 +951,10 @@ angular.module('app', []).controller('AppController', function($scope){
           else if(regex.SMOOSH.test(value)){
             operation = 'SMOOSH';
             operator = 'String Concatenation';
+          }
+          else if(regex.VISIBLE.test(value)){
+            operation = 'VISIBLE';
+            operator = 'Output Keyword';
           }
 
           addLexeme(operation, 'green-text', operator);

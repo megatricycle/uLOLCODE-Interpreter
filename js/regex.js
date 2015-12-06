@@ -13,15 +13,15 @@ module.exports = {
 
   'literal': /^(NOOB|WIN|FAIL|-?\d+|-?\d+\.\d+|".*"|[A-Za-z][A-Za-z0-9_]*|")$/,
 
-  'expression': /^(SUM OF .+ AN .+|DIFF OF .+ AN .+|PRODUKT OF .+ AN .+|QUOSHUNT OF .+ AN .+|MOD OF .+ AN .+|BIGGR OF .+ AN .+|SMALLR OF .+ AN .+|BOTH OF .+ AN .+|EITHER OF .+ AN .+|WON OF .+ AN .+|NOT .+|ALL OF .+ AN .+ MKAY|EITHER OF .+ AN .+ MKAY|BOTH SAEM .+ AN .+|DIFFRINT .+ AN .+|ALL OF .+|ANY OF .+|SMOOSH .+)$/,
+  'expression': /^(SUM OF .+ AN .+|DIFF OF .+ AN .+|PRODUKT OF .+ AN .+|QUOSHUNT OF .+ AN .+|MOD OF .+ AN .+|BIGGR OF .+ AN .+|SMALLR OF .+ AN .+|BOTH OF .+ AN .+|EITHER OF .+ AN .+|WON OF .+ AN .+|NOT .+|ALL OF .+ AN .+ MKAY|EITHER OF .+ AN .+ MKAY|BOTH SAEM .+ AN .+|DIFFRINT .+ AN .+|ALL OF .+|ANY OF .+|SMOOSH .+|VISIBLE .+)$/,
 
-  'expressionToken': /^(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF|BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM|DIFFRINT|SMOOSH)$/,
+  'expressionToken': /^(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF|BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM|DIFFRINT|SMOOSH|VISIBLE)$/,
 
   'unary': /^NOT/,
 
   'binary': /^(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF|BOTH OF|EITHER OF|WON OF|BOTH SAEM|DIFFRINT)/,
 
-  'infinity': /^(ALL OF|ANY OF|SMOOSH)/,
+  'infinity': /^(ALL OF|ANY OF|SMOOSH|VISIBLE)/,
 
   'HAI': /^\s*HAI\s*$/,
 
