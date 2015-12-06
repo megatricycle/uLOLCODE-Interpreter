@@ -1,7 +1,5 @@
 // @TODO:
-// string implicit typecast to other data types
 // nested operator on infinite operator
-// yarn on operations
 // visible infinite arity
 // suppress visible new line
 // DIFFRINT OF -> DIFFRINT
@@ -686,6 +684,9 @@ angular.module('app', []).controller('AppController', function($scope){
         $scope.selectionStack.pop();
       }
       else if(regex.literal.test(currentLexeme())){
+        // ensure first that this is not an assignemnt Statement
+        if(nextLexeme() == 'R') continue;
+
         var text;
 
         if(currentLexeme() == '"'){
@@ -1241,6 +1242,9 @@ angular.module('app', []).controller('AppController', function($scope){
           ret += nextLexeme();
           $scope.lexemeIndex += 2;
         }
+        else if(regex.expressionToken.test(currentLexeme())){
+          ret += evaluateExpression();
+        }
         else if(regex.literal.test(currentLexeme())){
           ret += parseLiteral(currentLexeme(), 'lol');
         }
@@ -1301,25 +1305,25 @@ angular.module('app', []).controller('AppController', function($scope){
         $scope.operationStack.push((firstOperand? 'FAIL': 'WIN') + '');
         return true;
       case 'SUM OF':
-        $scope.operationStack.push((firstOperand + secondOperand) + '');
+        $scope.operationStack.push((parseFloat(firstOperand) + parseFloat(secondOperand)) + '');
         return true;
       case 'DIFF OF':
-        $scope.operationStack.push((firstOperand - secondOperand) + '');
+        $scope.operationStack.push((parseFloat(firstOperand) - parseFloat(secondOperand)) + '');
         return true;
       case 'PRODUKT OF':
-        $scope.operationStack.push((firstOperand * secondOperand) + '');
+        $scope.operationStack.push((parseFloat(firstOperand) * parseFloat(secondOperand)) + '');
         return true;
       case 'QUOSHUNT OF':
-        $scope.operationStack.push((firstOperand / secondOperand) + '');
+        $scope.operationStack.push((parseFloat(firstOperand) / parseFloat(secondOperand)) + '');
         return true;
       case 'MOD OF':
-        $scope.operationStack.push((firstOperand % secondOperand) + '');
+        $scope.operationStack.push((parseFloat(firstOperand) % parseFloat(secondOperand)) + '');
         return true;
       case 'BIGGR OF':
-        $scope.operationStack.push((firstOperand >= secondOperand? firstOperand: secondOperand) + '');
+        $scope.operationStack.push((parseFloat(firstOperand) >= parseFloat(secondOperand)? parseFloat(firstOperand): parseFloat(secondOperand)) + '');
         return true;
       case 'SMALLR OF':
-        $scope.operationStack.push((firstOperand <= secondOperand? firstOperand: secondOperand) + '');
+        $scope.operationStack.push((parseFloat(firstOperand) <= parseFloat(secondOperand)? parseFloat(firstOperand): parseFloat(secondOperand)) + '');
         return true;
       case 'BOTH OF':
         $scope.operationStack.push((firstOperand && secondOperand? 'WIN': 'FAIL') + '');

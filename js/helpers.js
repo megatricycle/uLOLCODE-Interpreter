@@ -81,3 +81,8 @@ String.prototype.splitANArguments = function(){
 
   return r;
 }
+
+function parseNumber(x){
+  if(!isNaN(x)) return x;
+  return parseFloat(x.substring(1, x.length - 1));
+}
