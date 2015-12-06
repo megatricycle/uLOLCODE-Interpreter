@@ -1,3 +1,11 @@
+// @TODO:
+// nested operator on infinite operator
+// suppress visible new line
+
+// at wtf, push it value to selection stack and executedFlag
+// at case, skip when it != top of selection stack
+// at OMGWTF, skip when top of selection stack has executedFLag
+
 // angular part
 angular.module('app', []).controller('AppController', function($scope){
   $scope.lexemes = [];
@@ -517,7 +525,9 @@ angular.module('app', []).controller('AppController', function($scope){
         }
 
         if(ret.indexOf('"') == 0) printToConsole(ret.substring(ret.indexOf('"') + 1, ret.length - 1));
+        else if(ret.indexOf('"') > 0) printToConsole(ret.substring(0, ret.indexOf('"'))+ret.substring(ret.indexOf('"') + 1, ret.length - 1));
         else printToConsole(ret);
+
       }
       else if($scope.lexemes[$scope.lexemeIndex].lexeme.text == 'R'){
         identifier = $scope.lexemes[$scope.lexemeIndex - 1].lexeme.text;
@@ -634,13 +644,12 @@ angular.module('app', []).controller('AppController', function($scope){
       }
       else if(regex.WTF.test(currentLexeme())){
         $scope.selectionStack.push({
-          it: it().value.text,
-          hasExecuted: false
+          it: it().value.text
         });
       }
       else if(regex.OMGWTF.test(currentLexeme())){}
       else if(regex.OMG.test(currentLexeme())){
-        // if next literal == it, set running mode to true and lexemeIndex++ parseLiteral(it().value.text, null, 'stringify')));
+        // if next literal == it, set running mode to true and lexemeIndex++
         if(parseLiteral(nextLexeme()) == parseLiteral(it().value.text, null, 'stringify')){
           if(nextLexeme() == '"'){
             $scope.lexemeIndex += 3;
@@ -649,10 +658,14 @@ angular.module('app', []).controller('AppController', function($scope){
             $scope.lexemeIndex++;
           }
           $scope.runningMode = true;
-
         }
         else if($scope.runningMode){
-          $scope.lexemeIndex++;
+          if(nextLexeme() == '"'){
+            $scope.lexemeIndex += 3;
+          }
+          else{
+            $scope.lexemeIndex++;
+          }
         }
         // else skip
         else{
@@ -781,7 +794,7 @@ angular.module('app', []).controller('AppController', function($scope){
   function addSymbol(identifier, typeText, typeColor, valueText, valueColor){
     if(regex.reserved.test(identifier)){
       printToConsole('SYNTAX ERROR: Reserved word or keyword used as variable identifier ');
-      throw "error.";
+      throwError();
     }
 
     $scope.symbolTable.push({
@@ -806,7 +819,7 @@ angular.module('app', []).controller('AppController', function($scope){
 
     if(index == -1){
       printToConsole('RUNTIME ERROR: Variable does not exist');
-      throw 'Invalid index';
+      throwError();
     }
 
     $scope.symbolTable[index].type.text = typeText;
@@ -1483,7 +1496,7 @@ angular.module('app', []).controller('AppController', function($scope){
     else if(regex.variable.test(x)){
        if(!($scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', x)])){
          printToConsole('RUNTIME ERROR: Variable does not exist');
-         throw 'error at token ' + currentLexeme() + ', ' + $scope.lexemeIndex;
+         throwError();
        }
       x = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', x)].value.text;
       return parseLiteral(x, option1, option2);
@@ -1502,5 +1515,11 @@ angular.module('app', []).controller('AppController', function($scope){
   */
   function it(){
     return $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', 'IT')];
+  }
+
+  function throwError(){
+    $scope.state = 'idle';
+
+    throw new Error('Error.');
   }
 });
