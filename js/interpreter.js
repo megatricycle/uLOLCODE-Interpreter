@@ -465,6 +465,74 @@ angular.module('app', []).controller('AppController', function($scope){
         // edit symbol
         editSymbol(identifier, typeText, 'yellow-text', value, valueColor);
       }
+      else if($scope.lexemes[$scope.lexemeIndex].lexeme.text == 'R'){
+        identifier = $scope.lexemes[$scope.lexemeIndex - 1].lexeme.text;
+        value = $scope.lexemes[++$scope.lexemeIndex].lexeme.text;
+
+        var valueColor;
+
+        // identify typeText
+        if(regex.NOOB.test(value)){
+          // NOOB
+          typeText = 'NOOB';
+          valueColor = 'yellow-text';
+        }
+        else if(regex.TROOF.test(value)){
+          // TROOF
+          typeText = 'TROOF';
+          valueColor = 'red-text';
+        }
+        else if(regex.NUMBR.test(value)){
+          // NUMBR
+          typeText = 'NUMBR';
+          valueColor = 'white-text';
+        }
+        else if(regex.NUMBAR.test(value)){
+          // NUMBAR
+          typeText = 'NUMBAR';
+          valueColor = 'white-text';
+        }
+        else if(value == '"'){
+          // YARN
+          typeText = 'YARN';
+          valueColor = 'blue-text';
+
+          value = '"' + $scope.lexemes[++$scope.lexemeIndex].lexeme.text + '"';
+          $scope.lexemeIndex++;
+        }
+        else if(regex.expressionToken.test(value)){
+          value = evaluateExpression();
+          typeText = checkLiteral(value);
+
+          switch(typeText){
+            case 'NOOB':
+              valueColor = 'yellow-text';
+              break;
+            case 'TROOF':
+              valueColor = 'red-text';
+              break;
+            case 'NUMBR':
+            case 'NUMBAR':
+              valueColor = 'white-text';
+              break;
+            case 'YARN':
+              valueColor = 'blue-text';
+              break;
+          }
+        }
+        else{
+          // variable
+          // get symbol object
+          symbol = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', value)];
+
+          typeText = symbol.type.text;
+          value = symbol.value.text;
+          valueColor = symbol.value.color;
+        }
+
+        // edit symbol
+        editSymbol(identifier, typeText, 'yellow-text', value, valueColor);
+      }
       else if(regex.expressionToken.test(currentLexeme())){
         var text = parseLiteral(evaluateExpression(), 'lol', 'stringify')
         var type = checkLiteral(text);
