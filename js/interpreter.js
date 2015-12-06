@@ -1,7 +1,4 @@
 // @TODO:
-//syntax checking -> visible "
-//syntax checking -> var r "
-
 // nested operator on infinite operator
 // suppress visible new line
 
