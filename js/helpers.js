@@ -1,3 +1,7 @@
+/*
+  General helper functions.
+*/
+
 // http://stackoverflow.com/questions/7176908/how-to-get-index-of-object-by-its-property-in-javascript
 Array.prototype.indexOfAttr = function (attr, value) {
     for(var i = 0; i < this.length; i += 1) {
