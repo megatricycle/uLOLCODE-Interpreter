@@ -1,3 +1,11 @@
+// @TODO:
+// nested operator on infinite operator
+// suppress visible new line
+
+// at wtf, push it value to selection stack and executedFlag
+// at case, skip when it != top of selection stack
+// at OMGWTF, skip when top of selection stack has executedFLag
+
 // angular part
 angular.module('app', []).controller('AppController', function($scope){
   $scope.lexemes = [];
@@ -9,6 +17,7 @@ angular.module('app', []).controller('AppController', function($scope){
   $scope.operationStack = [];
   $scope.selectionStack = [];
   $scope.conditionStack = [];
+  $scope.infiniteArityStack = [];
   $scope.runningMode = false;
   $scope.buttonText = function(){
     if($scope.state == "input") return "RUNNING";
@@ -32,6 +41,7 @@ angular.module('app', []).controller('AppController', function($scope){
     $scope.operationStack = [];
     $scope.selectionStack = [];
     $scope.conditionStack = [];
+    $scope.infiniteArityStack = [];
     $scope.runningMode = false;
 
     // set lexemeIndex
@@ -229,6 +239,34 @@ angular.module('app', []).controller('AppController', function($scope){
       for(var i=1; i<($scope.lexemes.length)-1; i++){
         var identifier;
 
+        //checking for unary, binary, infiniteArityDelimeter
+        if(regex.unary.test($scope.lexemes[i].lexeme.text)){
+          identifier = $scope.lexemes[i+2].lexeme.text;
+          if(identifier == "AN"){
+            printToConsole('SYNTAX ERROR: Cannot append. Unary operation.');
+            return;
+          }
+        }
+
+        else if(regex.binary.test($scope.lexemes[i].lexeme.text)){
+          identifier = $scope.lexemes[i+4].lexeme.text;
+          if(identifier == "AN"){
+            printToConsole('SYNTAX ERROR: Cannot append. Binary operation.');
+            return;
+          }
+        }
+
+        //checking for aditional HAI and KTHXBYE
+        if($scope.lexemes[i].lexeme.text == "HAI"){
+          printToConsole('SYNTAX ERROR: Invalid "HAI" expression');
+          return;
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "KTHXBYE"){
+          printToConsole('SYNTAX ERROR: Invalid "KTHXBYE" expression');
+          return;
+        }
+
         //checking for etc
         if($scope.lexemes[i].lexeme.text == "I HAS A"){
           identifier = $scope.lexemes[++i].lexeme.text;
@@ -318,12 +356,25 @@ angular.module('app', []).controller('AppController', function($scope){
             return;
           }
         }
+
         else if($scope.lexemes[i].lexeme.text == "OBTW"){
           identifier = $scope.lexemes[++i].lexeme.text;
           if(identifier != "TLDR"){
             printToConsole('SYNTAX ERROR: No closing in "OBTW" expression');
             return;
           }
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "ALL OF"){
+          $scope.infiniteArityStack.push($scope.lexemes[i].lexeme.text);
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "ANY OF"){
+          $scope.infiniteArityStack.push($scope.lexemes[i].lexeme.text);
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "MKAY"){
+          $scope.infiniteArityStack.pop();
         }
 
         else if($scope.lexemes[i].desc == "Unknown Keyword"){
@@ -343,6 +394,11 @@ angular.module('app', []).controller('AppController', function($scope){
       //checking if the syntax checking stack still have unpopped values
       if($scope.conditionStack.length != 0){
         printToConsole('SYNTAX ERROR: Expected "OIC" expression');
+        return;
+      }
+
+      if($scope.infiniteArityStack.length != 0){
+        printToConsole('SYNTAX ERROR: Expected "MKAY" expression');
         return;
       }
 
@@ -491,7 +547,9 @@ angular.module('app', []).controller('AppController', function($scope){
         }
 
         if(ret.indexOf('"') == 0) printToConsole(ret.substring(ret.indexOf('"') + 1, ret.length - 1));
+        else if(ret.indexOf('"') > 0) printToConsole(ret.substring(0, ret.indexOf('"'))+ret.substring(ret.indexOf('"') + 1, ret.length - 1));
         else printToConsole(ret);
+
       }
       else if($scope.lexemes[$scope.lexemeIndex].lexeme.text == 'R'){
         identifier = $scope.lexemes[$scope.lexemeIndex - 1].lexeme.text;
@@ -1482,7 +1540,6 @@ angular.module('app', []).controller('AppController', function($scope){
     else if(regex.variable.test(x)){
        if(!($scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', x)])){
          printToConsole('RUNTIME ERROR: Variable does not exist');
-         throwError();
          throwError();
        }
       x = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', x)].value.text;
