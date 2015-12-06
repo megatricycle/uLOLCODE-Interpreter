@@ -250,11 +250,11 @@ angular.module('app', []).controller('AppController', function($scope){
         if($scope.lexemes[i].lexeme.text == "I HAS A"){
           identifier = $scope.lexemes[++i].lexeme.text;
           if(!(regex.variable.test(identifier))){
-            $scope.console.push({text: '> SYNTAX ERROR: Invalid variable next to "I HAS A" expression' });
+            printToConsole('SYNTAX ERROR: Invalid variable next to "I HAS A" expression');
             return;
           }
           if(regex.reserved.test(identifier)){
-            $scope.console.push({text: '> SYNTAX ERROR: Reserved word or keyword used as variable identifier ' });
+            printToConsole('SYNTAX ERROR: Reserved word or keyword used as variable identifier ');
             return;
           }
         }
@@ -262,11 +262,11 @@ angular.module('app', []).controller('AppController', function($scope){
         else if($scope.lexemes[i].lexeme.text == "GIMMEH"){
           identifier = $scope.lexemes[++i].lexeme.text;
           if(!(regex.variable.test(identifier))){
-            $scope.console.push({text: '> SYNTAX ERROR: Invalid variable next to "GIMMEH expression"'});
+            printToConsole('SYNTAX ERROR: Invalid variable next to "GIMMEH" expression');
             return;
           }
           if(regex.reserved.test(identifier)){
-            $scope.console.push({text: '> SYNTAX ERROR: Reserved word or keyword used as variable identifier ' });
+            printToConsole('SYNTAX ERROR: Reserved word or keyword used as variable identifier ');
             return;
           }
         }
@@ -319,15 +319,22 @@ angular.module('app', []).controller('AppController', function($scope){
         }
 
         else if($scope.lexemes[i].lexeme.text == "OBTW"){
-            // ignores lines before TLDR because used for multi line comments
-        }
+          identifier = $scope.lexemes[++i].lexeme.text;
+          var type = checkLiteral(identifier);
 
-        else if($scope.lexemes[i].lexeme.text == "TLDR"){
-            // closing for multi lines of code
+          if(type != "TLDR"){
+            printToConsole('SYNTAX ERROR: Invalid type next to "OBTW" expression');
+            return;
+          }
         }
         else if($scope.lexemes[i].desc == "Unknown Keyword"){
             // checks if value is string, number, numbar
             printToConsole('SYNTAX ERROR: Unknown keyword');
+            return;
+        }
+        else if($scope.lexemes[i].desc == "Invalid Keyword"){
+            // checks if value is string, number, numbar
+            printToConsole('SYNTAX ERROR: Invalid keyword');
             return;
         }
       }
@@ -960,7 +967,7 @@ angular.module('app', []).controller('AppController', function($scope){
 
       case 'invalid':
         value = value.substring(1, value.length - 1);
-        addLexeme(value, 'red-text', 'Invalid keyword');
+        addLexeme(value, 'red-text', 'Invalid Keyword');
         break;
       case 'expression':
         var operator;
