@@ -99,7 +99,7 @@ module.exports = {
 
   'arithmeticExpression': /^(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)$/,
 
-  'booleanExpression': /^(BOTH OF|EITHER OF|WON OF|NOT|DIFFRINT)$/,
+  'booleanExpression': /^(BOTH OF|EITHER OF|WON OF|NOT)$/,
 
   'reserved' : /^(HAI|KTHXBYE|NOT|ITZ|GIMMEH|NOOB|TROOF|NUMBR|NUMBAR|YARN|VISIBLE|R|SMOOSH|BTW|OBTW|TLDR|OIC|BUKKIT)*$/
 };
