@@ -258,20 +258,12 @@ angular.module('app', []).controller('AppController', function($scope){
             printToConsole('SYNTAX ERROR: Invalid variable next to "I HAS A" expression');
             return;
           }
-          if(regex.reserved.test(identifier)){
-            printToConsole('SYNTAX ERROR: Reserved word or keyword used as variable identifier ');
-            return;
-          }
         }
 
         else if($scope.lexemes[i].lexeme.text == "GIMMEH"){
           identifier = $scope.lexemes[++i].lexeme.text;
           if(!(regex.variable.test(identifier))){
             printToConsole('SYNTAX ERROR: Invalid variable next to "GIMMEH" expression');
-            return;
-          }
-          if(regex.reserved.test(identifier)){
-            printToConsole('SYNTAX ERROR: Reserved word or keyword used as variable identifier ');
             return;
           }
         }
@@ -487,6 +479,74 @@ angular.module('app', []).controller('AppController', function($scope){
         // edit symbol
         editSymbol(identifier, typeText, 'yellow-text', value, valueColor);
       }
+      else if($scope.lexemes[$scope.lexemeIndex].lexeme.text == 'R'){
+        identifier = $scope.lexemes[$scope.lexemeIndex - 1].lexeme.text;
+        value = $scope.lexemes[++$scope.lexemeIndex].lexeme.text;
+
+        var valueColor;
+
+        // identify typeText
+        if(regex.NOOB.test(value)){
+          // NOOB
+          typeText = 'NOOB';
+          valueColor = 'yellow-text';
+        }
+        else if(regex.TROOF.test(value)){
+          // TROOF
+          typeText = 'TROOF';
+          valueColor = 'red-text';
+        }
+        else if(regex.NUMBR.test(value)){
+          // NUMBR
+          typeText = 'NUMBR';
+          valueColor = 'white-text';
+        }
+        else if(regex.NUMBAR.test(value)){
+          // NUMBAR
+          typeText = 'NUMBAR';
+          valueColor = 'white-text';
+        }
+        else if(value == '"'){
+          // YARN
+          typeText = 'YARN';
+          valueColor = 'blue-text';
+
+          value = '"' + $scope.lexemes[++$scope.lexemeIndex].lexeme.text + '"';
+          $scope.lexemeIndex++;
+        }
+        else if(regex.expressionToken.test(value)){
+          value = evaluateExpression();
+          typeText = checkLiteral(value);
+
+          switch(typeText){
+            case 'NOOB':
+              valueColor = 'yellow-text';
+              break;
+            case 'TROOF':
+              valueColor = 'red-text';
+              break;
+            case 'NUMBR':
+            case 'NUMBAR':
+              valueColor = 'white-text';
+              break;
+            case 'YARN':
+              valueColor = 'blue-text';
+              break;
+          }
+        }
+        else{
+          // variable
+          // get symbol object
+          symbol = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', value)];
+
+          typeText = symbol.type.text;
+          value = symbol.value.text;
+          valueColor = symbol.value.color;
+        }
+
+        // edit symbol
+        editSymbol(identifier, typeText, 'yellow-text', value, valueColor);
+      }
       else if(regex.expressionToken.test(currentLexeme())){
         var text = parseLiteral(evaluateExpression(), 'lol', 'stringify')
         var type = checkLiteral(text);
@@ -674,6 +734,11 @@ angular.module('app', []).controller('AppController', function($scope){
   }
 
   function addSymbol(identifier, typeText, typeColor, valueText, valueColor){
+    if(regex.reserved.test(identifier)){
+      printToConsole('SYNTAX ERROR: Reserved word or keyword used as variable identifier ');
+      throw "error.";
+    }
+
     $scope.symbolTable.push({
       identifier: identifier,
       type: {
@@ -691,7 +756,10 @@ angular.module('app', []).controller('AppController', function($scope){
     // get index of identifier
     var index = $scope.symbolTable.indexOfAttr('identifier',  identifier);
 
-    if(index == -1) throw 'Invalid index';
+    if(index == -1){
+      printToConsole('RUNTIME ERROR: Variable does noT exist');
+      throw 'Invalid index';
+    }
 
     $scope.symbolTable[index].type.text = typeText;
     $scope.symbolTable[index].type.color = typeColor;
@@ -831,6 +899,10 @@ angular.module('app', []).controller('AppController', function($scope){
         else if(value == 'DIFFRINT'){
           operation = 'DIFFRINT';
           operator = 'Inequality Operator';
+        }
+        else if(value == 'NOT'){
+          operation = 'NOT';
+          operator = 'Negation Operator';
         }
 
         addLexeme(operation, 'green-text', operator);
@@ -1070,7 +1142,9 @@ angular.module('app', []).controller('AppController', function($scope){
       }
     }
     else if(regex.binary.test(currentLexeme())){
+      // perform operations in a stack
       do{
+        // if stack is eligible for performing
         if($scope.operationStack[$scope.operationStack.length - 1] &&
            $scope.operationStack[$scope.operationStack.length - 2] &&
            !regex.expressionToken.test($scope.operationStack[$scope.operationStack.length - 1]) &&
@@ -1084,6 +1158,7 @@ angular.module('app', []).controller('AppController', function($scope){
           rightOperand = parseLiteral(rightOperand);
           leftOperand = parseLiteral(leftOperand);
 
+          // evaluate expression
           var operatedFlag = false;
           operatedFlag = evaluateOperation(operator, leftOperand, rightOperand);
 
@@ -1161,7 +1236,7 @@ angular.module('app', []).controller('AppController', function($scope){
         $scope.lexemeIndex++;
       }
 
-      // evaluate the whole stack with the operator]
+      // evaluate the whole stack with the operator
       var ret;
       if(operator == 'ALL OF'){
         if(infiniteStack.indexOf('FAIL') == -1) ret = 'WIN';
@@ -1177,7 +1252,13 @@ angular.module('app', []).controller('AppController', function($scope){
     }
   }
 
+  /*
+    Evaluates an expression, given an operator and at least 1 operand.
+  */
   function evaluateOperation(operator, firstOperand, secondOperand){
+    // add default value of secondOperand
+    secondOperand = secondOperand || true;
+
     //runtime syntax checking
     if(regex.arithmeticExpression.test(operator)){
       if(!( regex.NUMBR.test(firstOperand) || regex.NUMBAR.test(firstOperand) || regex.YARN.test(firstOperand) )){
@@ -1248,14 +1329,23 @@ angular.module('app', []).controller('AppController', function($scope){
     }
   }
 
+  /*
+    Returns the current lexeme.
+  */
   function currentLexeme(){
     return $scope.lexemes[$scope.lexemeIndex].lexeme.text;
   }
 
+  /*
+    Returns the next lexeme.
+  */
   function nextLexeme(){
     return $scope.lexemes[$scope.lexemeIndex + 1].lexeme.text;
   }
 
+  /*
+    Places the lexeme index to the supposed matching keyword of the current lexeme. Factors in nested keywords.
+  */
   function skipToNext(){
     var stack = [];
 
@@ -1293,11 +1383,17 @@ angular.module('app', []).controller('AppController', function($scope){
         $scope.lexemeIndex++;
       } while(currentLexeme() != 'OIC');
     }
-    // omg wtf possible bug
 
     $scope.lexemeIndex--;
   }
 
+  /*
+    Returns the parsed value given a string input.
+
+    example:
+      input: "1"
+      output: 1
+  */
   function parseLiteral(x, option1, option2){
     if(regex.NUMBR.test(x)){
       return parseInt(x);
@@ -1321,19 +1417,25 @@ angular.module('app', []).controller('AppController', function($scope){
       return x.substring(1, x.length - 1);
     }
     else if(regex.variable.test(x)){
-      // if(!$scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', x)]){
-      //   printToConsole('RUNTIME ERROR: Variable does not exist');
-      //   throw 'string';
-      // }
+       if(!($scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', x)])){
+         printToConsole('RUNTIME ERROR: Variable does not exist');
+         throw 'string';
+       }
       x = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', x)].value.text;
       return parseLiteral(x, option1, option2);
     }
   }
 
+  /*
+    Returns the index of IT variable in the symble table.
+  */
   function indexOfIt(){
     return $scope.symbolTable.indexOfAttr('identifier', 'IT');
   }
 
+  /*
+    Returns the object IT variable.
+  */
   function it(){
     return $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', 'IT')];
   }
