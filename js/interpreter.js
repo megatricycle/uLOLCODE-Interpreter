@@ -1,10 +1,10 @@
 // @TODO:
-// string typecast to other data types
+// string implicit typecast to other data types
 // nested operator on infinite operator
 // switch
+// visible infinite arity
+// suppress visible new line
 
-// may it variable
-// may selection stack, true
 // at wtf, push it value to selection stack and executedFlag
 // at case, skip when it != top of selection stack
 // at OMGWTF, skip when top of selection stack has executedFLag
@@ -48,7 +48,14 @@ angular.module('app', []).controller('AppController', function($scope){
 
     // split by lines
     var code = ace.edit("editor").getValue();
-    var lines = code.split('\n');
+    var lines = [];
+
+    // split by soft breaks
+    var segments = code.split(',');
+    segments.forEach(function(segment){
+      lines = lines.concat(segment.split('\n'));
+    });
+
     var identifier;
 
     // get lexemes
@@ -459,8 +466,6 @@ angular.module('app', []).controller('AppController', function($scope){
           case 'expressionToken':
             var expressionValue = evaluateExpression();
             var expressionType = checkLiteral(expressionValue);
-
-            console.log(expressionValue);
 
             switch(expressionType){
               case 'TROOF':
