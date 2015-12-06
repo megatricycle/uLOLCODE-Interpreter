@@ -646,16 +646,13 @@ angular.module('app', []).controller('AppController', function($scope){
       }
       else if(regex.ORLY.test(currentLexeme())){
         $scope.selectionStack.push($scope.it.value.text);
-        console.log($scope.selectionStack);
       }
       else if(regex.YARLY.test(currentLexeme())){
-        console.log('yarly');
         if($scope.selectionStack[$scope.selectionStack.length - 1] == 'FAIL'){
           skipToNext();
         }
       }
       else if(regex.NOWAI.test(currentLexeme())){
-        console.log('nowai');
         if($scope.selectionStack[$scope.selectionStack.length - 1] == 'WIN'){
           skipToNext();
         }
