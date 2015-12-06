@@ -1,6 +1,5 @@
 // @TODO:
 // nested operator on infinite operator
-// visible infinite arity (RE-CHECK)
 // suppress visible new line
 
 // at wtf, push it value to selection stack and executedFlag
@@ -478,7 +477,8 @@ angular.module('app', []).controller('AppController', function($scope){
           $scope.lexemeIndex++;
         }
 
-        printToConsole(ret);
+        if(ret.indexOf('"') == 0) printToConsole(ret.substring(ret.indexOf('"') + 1, ret.length - 1));
+        else printToConsole(ret);
         // edit symbol
         editSymbol(identifier, typeText, 'yellow-text', value, valueColor);
       }
