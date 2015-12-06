@@ -229,8 +229,17 @@ angular.module('app', []).controller('AppController', function($scope){
       for(var i=1; i<($scope.lexemes.length)-1; i++){
         var identifier;
 
+        //checking for aditional HAI and KTHXBYE
+        if($scope.lexemes[i].lexeme.text == "HAI"){
+          printToConsole('SYNTAX ERROR: Invalid "HAI" expression');
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "KTHXBYE"){
+          printToConsole('SYNTAX ERROR: Invalid "KTHXBYE" expression');
+        }
+
         //checking for unary, binary, infiniteArityDelimeter
-        if(regex.unary.test($scope.lexemes[i].lexeme.text)){
+        else if(regex.unary.test($scope.lexemes[i].lexeme.text)){
           identifier = $scope.lexemes[i+2].lexeme.text;
           if(identifier == "AN"){
             printToConsole('SYNTAX ERROR: Cannot append. Unary operation.');
@@ -275,7 +284,7 @@ angular.module('app', []).controller('AppController', function($scope){
           identifier = $scope.lexemes[++i].lexeme.text;
           var type = checkLiteral(identifier);
 
-          if(type == "invalid"){
+          if  (type == "invalid"){
             printToConsole('SYNTAX ERROR: Invalid type next to "R" expression');
             return;
           }
