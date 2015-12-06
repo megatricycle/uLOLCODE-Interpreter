@@ -2,7 +2,6 @@
 // nested operator on infinite operator
 // visible infinite arity
 // suppress visible new line
-// DIFFRINT OF -> DIFFRINT
 
 // at wtf, push it value to selection stack and executedFlag
 // at case, skip when it != top of selection stack
@@ -957,12 +956,12 @@ angular.module('app', []).controller('AppController', function($scope){
           operation = 'WON OF';
           operator = 'Xor Operator';
         }
-        else if(value == 'BOTH SAEM OF'){
-          operation = 'BOTH SAEM OF';
+        else if(value == 'BOTH SAEM'){
+          operation = 'BOTH SAEM';
           operator = 'Equality Operator';
         }
-        else if(value == 'DIFFRINT OF'){
-          operation = 'DIFFRINT OF';
+        else if(value == 'DIFFRINT'){
+          operation = 'DIFFRINT';
           operator = 'Inequality Operator';
         }
 
@@ -1037,12 +1036,12 @@ angular.module('app', []).controller('AppController', function($scope){
             operation = 'WON OF';
             operator = 'Xor Operator';
           }
-          else if(regex.BOTHSAEMOF.test(value)){
-            operation = 'BOTH SAEM OF';
+          else if(regex.BOTHSAEM.test(value)){
+            operation = 'BOTH SAEM';
             operator = 'Equality Operator';
           }
-          else if(regex.DIFFRINTOF.test(value)){
-            operation = 'DIFFRINT OF';
+          else if(regex.DIFFRINT.test(value)){
+            operation = 'DIFFRINT';
             operator = 'Inequality Operator';
           }
 
@@ -1140,7 +1139,7 @@ angular.module('app', []).controller('AppController', function($scope){
     var c = 0;
 
     for(i = 0; i < a.length; i++){
-      if(a[i] == 'SUM OF' || a[i] == 'DIFF OF' || a[i] == 'PRODUKT OF' || a[i] == 'QUOSHUNT OF' || a[i] == 'MOD OF' || a[i] == 'BIGGR OF' || a[i] == 'SMALLR OF' || a[i] == 'BOTH OF' || a[i] == 'EITHER OF' || a[i] == 'WON OF' || a[i] == 'BOTH SAEM OF' || a[i] == 'DIFFRINT OF'){
+      if(a[i] == 'SUM OF' || a[i] == 'DIFF OF' || a[i] == 'PRODUKT OF' || a[i] == 'QUOSHUNT OF' || a[i] == 'MOD OF' || a[i] == 'BIGGR OF' || a[i] == 'SMALLR OF' || a[i] == 'BOTH OF' || a[i] == 'EITHER OF' || a[i] == 'WON OF' || a[i] == 'BOTH SAEM' || a[i] == 'DIFFRINT'){
         stack.push(a[i]);
       }
       else if(a[i] == 'AN'){
@@ -1341,10 +1340,10 @@ angular.module('app', []).controller('AppController', function($scope){
       case 'WON OF':
         $scope.operationStack.push(((firstOperand? !secondOperand: secondOperand)? 'WIN': 'FAIL') + '');
         return true;
-      case 'BOTH SAEM OF':
+      case 'BOTH SAEM':
         $scope.operationStack.push((firstOperand == secondOperand? 'WIN': 'FAIL') + '');
         return true;
-      case 'DIFFRINT OF':
+      case 'DIFFRINT':
         $scope.operationStack.push((firstOperand != secondOperand? 'WIN': 'FAIL') + '');
         return true;
       default:
