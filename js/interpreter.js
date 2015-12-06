@@ -236,7 +236,23 @@ angular.module('app', []).controller('AppController', function($scope){
       for(var i=1; i<($scope.lexemes.length)-1; i++){
         var identifier;
 
-        if($scope.lexemes[i].lexeme.text == "I HAS A"){
+        //checking for unary, binary, infiniteArityDelimeter
+        if(regex.unary.test($scope.lexemes[i].lexeme.text)){
+          identifier = $scope.lexemes[i+2].lexeme.text;
+          if(identifier == "AN"){
+            printToConsole('SYNTAX ERROR: Cannot append. Unary operation.');
+          }
+        }
+
+        else if(regex.binary.test($scope.lexemes[i].lexeme.text)){
+          identifier = $scope.lexemes[i+4].lexeme.text;
+          if(identifier == "AN"){
+            printToConsole('SYNTAX ERROR: Cannot append. Binary operation.');
+          }
+        }
+
+        //checking for etc
+        else if($scope.lexemes[i].lexeme.text == "I HAS A"){
           identifier = $scope.lexemes[++i].lexeme.text;
           if(!(regex.variable.test(identifier))){
             printToConsole('SYNTAX ERROR: Invalid variable next to "I HAS A" expression');
@@ -301,37 +317,26 @@ angular.module('app', []).controller('AppController', function($scope){
           }
         }
 
-
-        else if($scope.lexemes[i].lexeme.text == "OMGWTF"){
-            // checks if value is string, number, numbar
-        }
-
-        else if($scope.lexemes[i].lexeme.text == "GTFO"){
-            // checks if value is string, number, numbar
-        }
-
-        else if($scope.lexemes[i].lexeme.text == "BTW"){
-            // ignores the entire line of comments
-        }
-
         else if($scope.lexemes[i].lexeme.text == "OBTW"){
           identifier = $scope.lexemes[++i].lexeme.text;
-
           if(identifier != "TLDR"){
             printToConsole('SYNTAX ERROR: No closing in "OBTW" expression');
             return;
           }
         }
+
         else if($scope.lexemes[i].desc == "Unknown Keyword"){
             // checks if value is string, number, numbar
             printToConsole('SYNTAX ERROR: Unknown keyword');
             return;
         }
+
         else if($scope.lexemes[i].desc == "Invalid Keyword"){
             // checks if value is string, number, numbar
             printToConsole('SYNTAX ERROR: Invalid keyword');
             return;
         }
+
       }
 
       $scope.run(0);
@@ -1176,23 +1181,23 @@ angular.module('app', []).controller('AppController', function($scope){
     //runtime syntax checking
     if(regex.arithmeticExpression.test(operator)){
       if(!( regex.NUMBR.test(firstOperand) || regex.NUMBAR.test(firstOperand) || regex.YARN.test(firstOperand) )){
-        printToConsole('SYNTAX ERROR: Invalid first operand');
+        printToConsole('RUNTIME ERROR: Invalid first operand');
         return false;
       }
 
       if(!( regex.NUMBR.test(secondOperand) || regex.NUMBAR.test(secondOperand) || regex.YARN.test(secondOperand) )){
-        printToConsole('SYNTAX ERROR: Invalid second operand');
+        printToConsole('RUNTIME ERROR: Invalid second operand');
         return false;
       }
     }
 
     if(regex.booleanExpression.test(operator)){
       if(!( firstOperand === true || firstOperand === false)){
-        printToConsole('SYNTAX ERROR: Invalid first operand');
+        printToConsole('RUNTIME ERROR: Invalid first operand');
         return false;
       }
       if(!( secondOperand === true || secondOperand === false)){
-        printToConsole('SYNTAX ERROR: Invalid second operand');
+        printToConsole('RUNTIME ERROR: Invalid second operand');
         return false;
       }
     }
@@ -1316,6 +1321,10 @@ angular.module('app', []).controller('AppController', function($scope){
       return x.substring(1, x.length - 1);
     }
     else if(regex.variable.test(x)){
+      // if(!$scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', x)]){
+      //   printToConsole('RUNTIME ERROR: Variable does not exist');
+      //   throw 'string';
+      // }
       x = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', x)].value.text;
       return parseLiteral(x, option1, option2);
     }
