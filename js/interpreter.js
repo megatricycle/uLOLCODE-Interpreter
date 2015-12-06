@@ -17,6 +17,7 @@ angular.module('app', []).controller('AppController', function($scope){
   $scope.operationStack = [];
   $scope.selectionStack = [];
   $scope.conditionStack = [];
+  $scope.infiniteArityStack = [];
   $scope.runningMode = false;
   $scope.buttonText = function(){
     if($scope.state == "input") return "RUNNING";
@@ -40,6 +41,7 @@ angular.module('app', []).controller('AppController', function($scope){
     $scope.operationStack = [];
     $scope.selectionStack = [];
     $scope.conditionStack = [];
+    $scope.infiniteArityStack = [];
     $scope.runningMode = false;
 
     // set lexemeIndex
@@ -354,12 +356,25 @@ angular.module('app', []).controller('AppController', function($scope){
             return;
           }
         }
+
         else if($scope.lexemes[i].lexeme.text == "OBTW"){
           identifier = $scope.lexemes[++i].lexeme.text;
           if(identifier != "TLDR"){
             printToConsole('SYNTAX ERROR: No closing in "OBTW" expression');
             return;
           }
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "ALL OF"){
+          $scope.infiniteArityStack.push($scope.lexemes[i].lexeme.text);
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "ANY OF"){
+          $scope.infiniteArityStack.push($scope.lexemes[i].lexeme.text);
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "MKAY"){
+          $scope.infiniteArityStack.pop();
         }
 
         else if($scope.lexemes[i].desc == "Unknown Keyword"){
@@ -379,6 +394,11 @@ angular.module('app', []).controller('AppController', function($scope){
       //checking if the syntax checking stack still have unpopped values
       if($scope.conditionStack.length != 0){
         printToConsole('SYNTAX ERROR: Expected "OIC" expression');
+        return;
+      }
+
+      if($scope.infiniteArityStack.length != 0){
+        printToConsole('SYNTAX ERROR: Expected "MKAY" expression');
         return;
       }
 
