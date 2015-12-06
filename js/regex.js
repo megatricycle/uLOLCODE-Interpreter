@@ -73,7 +73,7 @@ module.exports = {
 
   'TLDR': /^\s*TLDR\s*$/,
 
-  'ORLY': /^\s*ORLY\?\s*$/,
+  'ORLY': /^\s*O RLY\?\s*$/,
 
   'YARLY': /^\s*YA RLY\s*$/,
 
@@ -92,6 +92,10 @@ module.exports = {
   'BOTHSAEM': /^\s*BOTH SAEM\s+/,
 
   'DIFFRINT': /^\s*DIFFRINT\s+/,
+
+  'arithmeticExpression': /^(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF)$/,
+
+  'booleanExpression': /^(BOTH OF|BOTH SAEM|EITHER OF|WON OF|NOT|DIFFRINT)$/,
 
   'reserved' : /^(HAI|KTHXBYE|NOT|ITZ|GIMMEH|NOOB|TROOF|NUMBR|NUMBAR|YARN|VISIBLE|R|SMOOSH|BTW|OBTW|NOT|TLDR|OIC|BUKKIT)*$/
 };
