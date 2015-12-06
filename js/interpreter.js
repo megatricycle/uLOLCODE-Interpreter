@@ -8,6 +8,7 @@ angular.module('app', []).controller('AppController', function($scope){
   $scope.identifier = null;
   $scope.operationStack = [];
   $scope.selectionStack = [];
+  $scope.conditionStack = [];
   $scope.runningMode = false;
   $scope.buttonText = function(){
     if($scope.state == "input") return "RUNNING";
@@ -30,6 +31,7 @@ angular.module('app', []).controller('AppController', function($scope){
     $scope.symbolTable = [];
     $scope.operationStack = [];
     $scope.selectionStack = [];
+    $scope.conditionStack = [];
     $scope.runningMode = false;
 
     // set lexemeIndex
@@ -232,6 +234,7 @@ angular.module('app', []).controller('AppController', function($scope){
           identifier = $scope.lexemes[i+2].lexeme.text;
           if(identifier == "AN"){
             printToConsole('SYNTAX ERROR: Cannot append. Unary operation.');
+            return;
           }
         }
 
@@ -239,6 +242,7 @@ angular.module('app', []).controller('AppController', function($scope){
           identifier = $scope.lexemes[i+4].lexeme.text;
           if(identifier == "AN"){
             printToConsole('SYNTAX ERROR: Cannot append. Binary operation.');
+            return;
           }
         }
 
@@ -275,23 +279,62 @@ angular.module('app', []).controller('AppController', function($scope){
             printToConsole('SYNTAX ERROR: Invalid type next to "R" expression');
             return;
           }
-
         }
 
         else if($scope.lexemes[i].lexeme.text == "AN"){
           identifier =  $scope.lexemes[++i].lexeme.text;
           if(identifier == "AN"){
             printToConsole('SYNTAX ERROR: Cannot use AN after AN expression');
+            return;
+          }
+        }
+
+        //comments
+        else if($scope.lexemes[i].lexeme.text == "OBTW"){
+          identifier = $scope.lexemes[++i].lexeme.text;
+          //for checking if there is a closing statement
+          if(identifier != "TLDR"){
+            printToConsole('SYNTAX ERROR: No closing in "OBTW" expression');
+            return;
           }
         }
 
         else if($scope.lexemes[i].lexeme.text == "O RLY?"){
+          $scope.conditionStack.push($scope.lexemes[i].lexeme.text);
           identifier =  $scope.lexemes[++i].lexeme.text;
           if(identifier != "YA RLY"){
             printToConsole('SYNTAX ERROR: Expected expression after "O RLY?"');
+            return;
           }
         }
 
+        else if($scope.lexemes[i].lexeme.text == "WTF?"){
+          $scope.conditionStack.push($scope.lexemes[i].lexeme.text);
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "OIC"){
+          if($scope.conditionStack.length > 0){
+            $scope.conditionStack.pop();
+          }
+          else{
+            printToConsole('SYNTAX ERROR: Expected expression before "OIC"');
+            return;
+          }
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "OMG"){
+          if($scope.conditionStack.indexOf('WTF?') == -1){
+            printToConsole('SYNTAX ERROR: "OMG" expression not inside switch case statement');
+            return;
+          }
+        }
+
+        else if($scope.lexemes[i].lexeme.text == "OMGWTF"){
+          if($scope.conditionStack.indexOf('WTF?') == -1){
+            printToConsole('SYNTAX ERROR: "OMGWTF" expression not inside switch case statement');
+            return;
+          }
+        }
         else if($scope.lexemes[i].lexeme.text == "OBTW"){
           identifier = $scope.lexemes[++i].lexeme.text;
           if(identifier != "TLDR"){
@@ -311,7 +354,13 @@ angular.module('app', []).controller('AppController', function($scope){
             printToConsole('SYNTAX ERROR: Invalid keyword');
             return;
         }
+      }
 
+
+      //checking if the syntax checking stack still have unpopped values
+      if($scope.conditionStack.length != 0){
+        printToConsole('SYNTAX ERROR: Expected "OIC" expression');
+        return;
       }
 
       $scope.run(0);
