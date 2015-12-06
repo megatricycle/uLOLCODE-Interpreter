@@ -172,7 +172,7 @@ angular.module('app', []).controller('AppController', function($scope){
         addLexemeLiteral(lines[i], 'expression');
       }
       else if(regex.ORLY.test(lines[i])){
-        addLexeme('O RLY?', 'white-text', 'If-then Statement');
+        addLexeme('O RLY?', 'green-text', 'If-then Statement');
       }
       else if(regex.YARLY.test(lines[i])){
         addLexeme('YA RLY', 'green-text', 'If Clause');
@@ -542,6 +542,9 @@ angular.module('app', []).controller('AppController', function($scope){
         // edit symbol
         editSymbol(identifier, typeText, 'yellow-text', value, valueColor);
       }
+      else if(regex.BTW.test(currentLexeme())){}
+      else if(regex.OBTW.test(currentLexeme())){}
+      else if(regex.TLDR.test(currentLexeme())){}
       else if(regex.expressionToken.test(currentLexeme())){
         var text = parseLiteral(evaluateExpression(), 'lol', 'stringify')
         var type = checkLiteral(text);
@@ -728,6 +731,9 @@ angular.module('app', []).controller('AppController', function($scope){
     });
   }
 
+  /*
+    Adds a variable in the symbol table.
+  */
   function addSymbol(identifier, typeText, typeColor, valueText, valueColor){
     if(regex.reserved.test(identifier)){
       printToConsole('SYNTAX ERROR: Reserved word or keyword used as variable identifier ');
@@ -747,6 +753,9 @@ angular.module('app', []).controller('AppController', function($scope){
     });
   }
 
+  /*
+    Edits a variable in the symbol table.
+  */
   function editSymbol(identifier, typeText, typeColor, valueText, valueColor){
     // get index of identifier
     var index = $scope.symbolTable.indexOfAttr('identifier',  identifier);
@@ -762,12 +771,18 @@ angular.module('app', []).controller('AppController', function($scope){
     $scope.symbolTable[index].value.color = valueColor;
   }
 
+  /*
+    Prints into the application console.
+  */
   function printToConsole(text){
     $scope.console.push({
       text: '> ' + text
     });
   }
 
+  /*
+    Returns the kind of literal of the input.
+  */
   function checkLiteral(value){
     if(value == 'AN'){
       return 'operandSeparator'
@@ -808,6 +823,9 @@ angular.module('app', []).controller('AppController', function($scope){
     else return 'invalid';
   }
 
+  /*
+    Adds a lexeme token, given a value and its type.
+  */
   function addLexemeLiteral(value, type){
     switch(type){
       case 'NOOB':
@@ -839,7 +857,6 @@ angular.module('app', []).controller('AppController', function($scope){
         addLexeme('MKAY', 'purple-text', 'Infinite Arity Delimeter');
         break;
       case 'expressionToken':
-        // 'expressionToken': /^(SUM OF|DIFF OF|PRODUKT OF|QUOSHUNT OF|MOD OF|BIGGR OF|SMALLR OF|BOTH OF|EITHER OF|WON OF|NOT|ALL OF|ANY OF|BOTH SAEM OF|DIFFRINT OF|SMOOSH)$/,
         var operator;
         var operation;
 
@@ -1037,6 +1054,9 @@ angular.module('app', []).controller('AppController', function($scope){
     }
   }
 
+  /*
+    Returns an array of splitted operands.
+  */
   function splitANInfinite(string){
     var s = string;
 
@@ -1060,6 +1080,9 @@ angular.module('app', []).controller('AppController', function($scope){
     return a;
   }
 
+  /*
+    Returns an array consisting of splitted operands. Factors nesting.
+  */
   function splitAN(string){
     var s = string;
 
@@ -1101,7 +1124,9 @@ angular.module('app', []).controller('AppController', function($scope){
     return [string.substring(0, i), string.substring(i + 3)]
   }
 
-  // @TODO: YARN not working
+  /*
+    Returns the result of an expression at current lexeme.
+  */
   function evaluateExpression(){
     if(regex.unary.test(currentLexeme())){
       if(currentLexeme() == 'NOT'){
@@ -1414,7 +1439,7 @@ angular.module('app', []).controller('AppController', function($scope){
     else if(regex.variable.test(x)){
        if(!($scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', x)])){
          printToConsole('RUNTIME ERROR: Variable does not exist');
-         throw 'string';
+         throw 'error at token ' + currentLexeme() + ', ' + $scope.lexemeIndex;
        }
       x = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', x)].value.text;
       return parseLiteral(x, option1, option2);
