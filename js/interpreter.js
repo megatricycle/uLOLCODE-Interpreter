@@ -16,7 +16,6 @@ angular.module('app', []).controller('AppController', function($scope){
   $scope.state = "idle";
   $scope.identifier = null;
   $scope.operationStack = [];
-  $scope.it = null;
   $scope.selectionStack = [];
   $scope.runningMode = false;
   $scope.buttonText = function(){
@@ -39,7 +38,6 @@ angular.module('app', []).controller('AppController', function($scope){
     $scope.lexemes = [];
     $scope.symbolTable = [];
     $scope.operationStack = [];
-    $scope.it = null;
     $scope.selectionStack = [];
     $scope.runningMode = false;
 
@@ -604,42 +602,36 @@ angular.module('app', []).controller('AppController', function($scope){
         editSymbol(identifier, typeText, 'yellow-text', value, valueColor);
       }
       else if(regex.expressionToken.test(currentLexeme())){
-        var it = {
-          type: {
-            text: null,
-            color: 'yellow-text'
-          },
-          value: {
-            text: parseLiteral(evaluateExpression(), 'lol', 'stringify'),
-            color: null
-          }
-        };
-
-        // get type
-        it.type.text = checkLiteral(it.value.text);
-
+        var text = parseLiteral(evaluateExpression(), 'lol', 'stringify')
+        var type = checkLiteral(text);
+        var color;
         // get color
 
-        switch(it.type.text){
+        switch(type){
           case 'NOOB':
-            it.value.color = 'yellow-text';
+            color = 'yellow-text';
             break;
           case 'TROOF':
-            it.value.color = 'red-text';
+            color = 'red-text';
             break;
           case 'NUMBR':
           case 'NUMBAR':
-            it.value.color = 'white-text';
+            color = 'white-text';
             break;
           case 'YARN':
-            it.value.color = 'blue-text';
+            color = 'blue-text';
             break;
         }
 
-        $scope.it = it;
+        if(indexOfIt() == -1){
+          addSymbol('IT', type, 'yellow-text', text, color);
+        }
+        else{
+          editSymbol('IT', type, 'yellow-text', text, color);
+        }
       }
       else if(regex.ORLY.test(currentLexeme())){
-        $scope.selectionStack.push($scope.it.value.text);
+        $scope.selectionStack.push(it().value.text);
       }
       else if(regex.YARLY.test(currentLexeme())){
         if($scope.selectionStack[$scope.selectionStack.length - 1] == 'FAIL'){
@@ -653,14 +645,14 @@ angular.module('app', []).controller('AppController', function($scope){
       }
       else if(regex.WTF.test(currentLexeme())){
         $scope.selectionStack.push({
-          it: $scope.it.value.text,
+          it: it().value.text,
           hasExecuted: false
         });
       }
       else if(regex.OMGWTF.test(currentLexeme())){}
       else if(regex.OMG.test(currentLexeme())){
-        // if next literal == it, set running mode to true and lexemeIndex++ parseLiteral($scope.it.value.text, null, 'stringify')));
-        if(parseLiteral(nextLexeme()) == parseLiteral($scope.it.value.text, null, 'stringify')){
+        // if next literal == it, set running mode to true and lexemeIndex++ parseLiteral(it().value.text, null, 'stringify')));
+        if(parseLiteral(nextLexeme()) == parseLiteral(it().value.text, null, 'stringify')){
           if(nextLexeme() == '"'){
             $scope.lexemeIndex += 3;
           }
@@ -700,39 +692,32 @@ angular.module('app', []).controller('AppController', function($scope){
           text = parseLiteral(currentLexeme(), 'lol', 'stringify');
         }
 
-        var it = {
-          type: {
-            text: null,
-            color: 'yellow-text'
-          },
-          value: {
-            text: text,
-            color: null
-          }
-        };
-
-        // get type
-        it.type.text = checkLiteral(it.value.text);
-
+        var type = checkLiteral(text);
+        var color;
         // get color
 
-        switch(it.type.text){
+        switch(type){
           case 'NOOB':
-            it.value.color = 'yellow-text';
+            color = 'yellow-text';
             break;
           case 'TROOF':
-            it.value.color = 'red-text';
+            color = 'red-text';
             break;
           case 'NUMBR':
           case 'NUMBAR':
-            it.value.color = 'white-text';
+            color = 'white-text';
             break;
           case 'YARN':
-            it.value.color = 'blue-text';
+            color = 'blue-text';
             break;
         }
 
-        $scope.it = it;
+        if(indexOfIt() == -1){
+          addSymbol('IT', type, 'yellow-text', text, color);
+        }
+        else{
+          editSymbol('IT', type, 'yellow-text', text, color);
+        }
       }
     }
 
@@ -1424,5 +1409,13 @@ angular.module('app', []).controller('AppController', function($scope){
       x = $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', x)].value.text;
       return parseLiteral(x, option1, option2);
     }
+  }
+
+  function indexOfIt(){
+    return $scope.symbolTable.indexOfAttr('identifier', 'IT');
+  }
+
+  function it(){
+    return $scope.symbolTable[$scope.symbolTable.indexOfAttr('identifier', 'IT')];
   }
 });
